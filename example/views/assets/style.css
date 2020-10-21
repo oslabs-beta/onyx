@@ -1,0 +1,12 @@
+body {
+  background-color: cornflowerblue;
+}
+
+#input {
+  border-radius: 5px;
+  transition: box-shadow .3s;
+}
+
+#input:hover {
+  box-shadow: 0 0 10px #FFFF00;
+}
