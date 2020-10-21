@@ -1,4 +1,6 @@
 import { React } from '../deps.ts';
+import SimpleDiv from './components/SimpleDiv.tsx'
+// import './assets/style.css'
 
 // Typescript demands that we define the typing for each JSX element, 
 // so this global interface defines the 'any' typing for whatever elements we may need
@@ -21,6 +23,7 @@ const App = () => {
        <>
        <button onClick={() => setCount(count + 1)}>Click the 🦕</button>
        <p>{count}</p>
+       <SimpleDiv />
        <p>Hey!</p>
        </>
    ) 
