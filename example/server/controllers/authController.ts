@@ -6,18 +6,19 @@ userController.createUser = async (ctx: any, next: any) => {
   console.log('hello! in userController.createUser');
   // const cookies = await ctx.cookies.get('onyx');
   // console.log('cookies?', cookies);
-  const body = await ctx.request.body();
   if(ctx.request.hasBody) {
+    const body = await ctx.request.body();
     const { username, password } = await body.value;
     // ctx.cookies.set('onyx', 'cookie');
     const _id = await User.insertOne({username, password})
     console.log('id from database is', _id)
     ctx.response.body = {
       id: `id is ${_id}`,
-      message: `username is ${username}, password is ${password}`
+      message: `username is ${username}, password is ${password}`,
     }
   } else {
     ctx.response.body = {
+      success: true,
       message: 'need input, body is empty'
     }
   }
@@ -28,11 +29,56 @@ userController.createUser = async (ctx: any, next: any) => {
 }
 
 userController.verifyUser = async(ctx: any) => {
-//   const user = await User.find();
-//   ctx.response.body = user;
-  console.log('hello from verify user')
-  ctx.response.body = {...ctx.response.body,
-  message2: 'in verify user'};
+  if (ctx.request.hasBody) {
+    const body = await ctx.request.body();
+    const { username, password } = await body.value;
+    const user = await User.findOne({ username });
+    if (user && password === user.password) {
+      // password match - success && user exists
+      ctx.response.body = {
+        success: true,
+        message: 'Successfully logged in!',
+      }
+    } else if (user) {
+      // password mismatch - failure
+      ctx.response.body = {
+        success: false,
+        message: 'Password incorrect, dummy!',
+      }
+    } else {
+      ctx.response.body = {
+        // username mismatch - failure
+        success: false,
+        message: 'no such user found',
+      }
+    }
+    console.log(user);
+  } else {
+    // user didn't input anything
+    ctx.response.body = {
+      success: false,
+      message: 'did you send anything in the body?'
+    }
+  }
 }
 
 export default userController;
+
+// const getProduct = ({ params, response }: { params: { id: string }, response: any }) => {
+//   //iterate through the products array and check if the current object has an id that matches the destructured id
+//   const product: Product | undefined = products.find(p => p.id === params.id)
+
+//   if (product) {
+//     response.status = 200
+//     response.body = {
+//       success: true,
+//       data: product
+//     }
+//   } else {
+//     response.status = 404
+//     response.body = {
+//       success: false,
+//       msg: 'No product found'
+//     }
+//   }
+// }

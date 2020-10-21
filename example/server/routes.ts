@@ -14,15 +14,11 @@ router.post('/login', userController.verifyUser)
 
 router.post('/register', userController.createUser)
 
-
 // this works too, more in the callback style of express
 // router.post('/login', async(ctx) {
 //     console.log('in post login, before awaiting userController')
 //     await userController.createUser(ctx);
 //     console.log('in post login, after waiting for userController')
 // })
-
-
-
 
 export default router;
