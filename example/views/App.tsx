@@ -1,5 +1,5 @@
-import { React } from '../deps.ts';
-import SimpleDiv from './components/SimpleDiv.tsx'
+import { React } from '../../deps.ts';
+import Inputs from './components/Inputs.tsx'
 // import './assets/style.css'
 
 // Typescript demands that we define the typing for each JSX element, 
@@ -8,24 +8,21 @@ declare global {
     namespace JSX {
       interface IntrinsicElements {
         button: any;
+        input: any;
         div: any;
         h1: any;
         p: any;
-        h2: any;
       }
     }
   }
 
 const App = () => {
-  const [count, setCount] = (React as any).useState(0);
-  
    return (
-       <>
-       <button onClick={() => setCount(count + 1)}>Click the 🦕</button>
-       <p>{count}</p>
-       <SimpleDiv />
-       <p>Hey!</p>
-       </>
+     <>
+      <h1>Wanna sign up??</h1>
+      <p></p>
+      <Inputs />
+     </>
    ) 
 }
 

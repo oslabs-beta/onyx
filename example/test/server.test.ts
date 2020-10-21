@@ -7,7 +7,7 @@
 //   await request.get('/').expect('a lot of stuff, do we add in html version of app here?')
 // })
 
-import { superoak, describe, it, expect } from '../test_deps.ts';
+import { superoak, describe, it, expect } from '../../test_deps.ts';
 import { app } from '../server/server.tsx'
 
 // IIFE 
