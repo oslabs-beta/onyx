@@ -43,6 +43,7 @@ const Inputs: any = () => {
     <>
       <div className="inputs">
         <input
+          className="input-field"
           id="input-username"
           type="text"
           value={username}
@@ -51,6 +52,7 @@ const Inputs: any = () => {
         ></input>
         <p></p>
         <input
+          className="input-field"
           id="input-password"
           type="password"
           value={password}
