@@ -1,6 +1,7 @@
 import { Router } from '../../deps.ts'
 import App from "../views/App.tsx";
 import userController from './controllers/authController.ts'
+import cookieController from './controllers/cookieController.ts';
 // import users from './models/userModels.ts'
 
 const router = new Router();
@@ -10,7 +11,7 @@ router.get('/login', (ctx) => {
     console.log('in login!')
 })
 
-router.post('/login', userController.verifyUser) 
+router.post('/login', userController.verifyUser, cookieController.setCookie) 
 
 router.post('/register', userController.createUser)
 
