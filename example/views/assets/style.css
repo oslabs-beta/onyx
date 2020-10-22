@@ -2,11 +2,11 @@ body {
   background-color: cornflowerblue;
 }
 
-#input {
+.input-field {
   border-radius: 5px;
-  transition: box-shadow .3s;
+  transition: box-shadow 0.3s;
 }
 
-#input:hover {
-  box-shadow: 0 0 10px #FFFF00;
+.input-field:hover {
+  box-shadow: 0 0 10px #ffff00;
 }
