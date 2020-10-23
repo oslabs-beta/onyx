@@ -1,13 +1,27 @@
 // Line 2 imports Oak functionality
 import { Application, send, join, log } from '../../deps.ts';
+import { config, Session, SessionData } from '../../deps.ts';
+import { React, ReactDOMServer } from '../../deps.ts';
 import router from './routes.ts';
-import { config } from '../../deps.ts';
 import App from '../views/App.tsx';
 import Inputs from '../views/components/Inputs.tsx';
-import { React, ReactDOMServer } from '../../deps.ts';
+import sessionController from './controllers/sessionController.ts';
+import cookiesController from './controllers/cookiesController.ts';
 
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
+
+// session
+const session = new Session({ framework: 'oak' });
+await session.init();
+app.use(
+  session.use()(session, {
+    path: '/',
+    httpOnly: true,
+    // secure: true, // not accessable via JS
+    maxAge: 6000, // in ms maybe?
+  })
+); // seems to be setting the sid cookie no matter what
 
 const browserBundlePath: string = '/browser.js';
 
@@ -28,7 +42,15 @@ app.use(router.allowedMethods());
 
 app.use(async (ctx) => {
   const filePath = ctx.request.url.pathname;
+  const sessionID = await ctx.state.session.get('userId');
+  if (sessionID) console.log(`sessionID is`, sessionID);
+  const cookies = await ctx.cookies.get('sid');
+  console.log(`${filePath}: ${cookies}`);
   if (filePath === '/') {
+    // if (cookies) await sessionController.checkSession(ctx);
+    // else await cookiesController.setCookies(ctx);
+    await ctx.state.session.set('ctx.cookies.get("sid")', 'mongoDB_id.$id');
+
     ctx.response.type = `text/html`;
     ctx.response.body = html;
   } else if (filePath === browserBundlePath) {
