@@ -15,9 +15,9 @@ const session = new Session({ framework: 'oak' });
 await session.init();
 app.use(
   session.use()(session, {
-    path: '/',
-    httpOnly: true,
-    // secure: true, // not accessable via JS
+    path: '/w35235',
+    httpOnly: false,
+    secure: false, // not accessable via JS
     // maxAge: 6000, //
   })
 ); // seems to be setting the sid cookie no matter what

@@ -23,6 +23,8 @@ router.post(
   sessionController.startSession
 );
 
+router.get('/protected', sessionController.checkSession);
+
 // this works too, more in the callback style of express
 // router.post('/login', async(ctx) {
 //     console.log('in post login, before awaiting userController')

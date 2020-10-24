@@ -1,28 +1,49 @@
+import { stringToBytes } from 'https://deno.land/std@0.74.0/uuid/_common.ts';
+
 const sessionController: any = {};
 
 // is the user logged in already
 sessionController.checkSession = async (ctx: any, next: any) => {
-  console.log('hello from checkSession!  session db not set up yet :(');
-  // find cookie
-  const sidCookie = await ctx.cookies.get('sid');
-  const user_id = await ctx.state.session.get(sidCookie);
-
-  // check if cookie is in session
-  // // yes --> entend sessiondb --> go to deserialize to grab user-info --> direct user to PROTECTED route
-  // // no --> direct user to LOGIN/REGISTER route
+  // check if there user_id is stored in the session object for the current user
+  const userIDVal = await ctx.state.session.get('userIDKey');
+  console.log('user id from session', userIDVal);
+  // consider storing the isLoggedIn info in ctx.state or something instead of in the ctx.response.body since we want to redirect user in our middleware
+  if (userIDVal) {
+    ctx.response.body.id = userIDVal;
+    // grab more user info from MongoDb?
+    ctx.redirect('success'); // redirect to successful login page
+  } else {
+    // no userIDVal found
+    ctx.redirect('/'); // redirect to login page
+  }
 };
 
 // add session entry for user
 sessionController.startSession = async (ctx: any, next: any) => {
-  const sidCookie = await ctx.cookies.get('sid');
-
-  await ctx.state.session.set(sidCookie, 'mongoDB_id.$id'); // adding sid-cookie to sessionDB as key, and the user's mongoDB users_id.$id as value
-  // take the user's cookie and add to session database
+  // in session-mod.ts, first argument is sessionVariableKey, second argument is sessionVariableValue
+  await ctx.state.session.set('userIDKey', ctx.response.body.id);
+  console.log('ctx.state.session after log in', ctx.state.session);
 };
 
 // log out the user
 sessionController.endSession = async (ctx: any, next: any) => {
-  // take the user's cookie and delete entry in session database
+  const sidCookie = await ctx.cookie.get('sid');
+  ctx.state.session._session._store.deleteSession(sidCookie);
+  // delete ctx.state.session._session._store._sessionMemoryStore[sidCookie];
+  console.log('ctx.state.session after log out', ctx.state.session);
 };
+
+// _sessionMemoryStore: {
+//   "1e9c7684-0a3b-4bb7-84c5-bf30560916d2": {'userIDKey': null},
+//   "ea759933-df0b-46e2-ad32-8e05fb8a27f4": [Object]
+// }
+// session.set is using this:
+// function set(sessionVariableKey: string, sessionVariableValue: string) : Promise<void> {
+// 	await this._session._store.setSessionVariable(this.sessionId, sessionVariableKey, sessionVariableValue);
+// }
+
+// function setSessionVariable(sessionId: any, sessionVariableKey: any, sessionVariableValue: any) : Promise<void> {
+// 	this._sessionMemoryStore[sessionId][sessionVariableKey] = sessionVariableValue;
+// }
 
 export default sessionController;
