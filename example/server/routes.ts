@@ -13,11 +13,15 @@ router.get('/login', (ctx) => {
 
 router.post(
   '/login',
-  userController.verifyUser
-  // sessionController.startSession
+  userController.verifyUser,
+  sessionController.startSession
 );
 
-router.post('/register', userController.createUser);
+router.post(
+  '/register',
+  userController.createUser,
+  sessionController.startSession
+);
 
 // this works too, more in the callback style of express
 // router.post('/login', async(ctx) {
