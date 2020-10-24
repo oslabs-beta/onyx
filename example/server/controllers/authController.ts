@@ -1,3 +1,4 @@
+
 import User from '../models/userModels.ts';
 
 const userController: any = {};
@@ -28,7 +29,8 @@ userController.createUser = async (ctx: any, next: any) => {
   // }
 };
 
-userController.verifyUser = async (ctx: any) => {
+
+userController.verifyUser = async (ctx: any, next: any) => {
   if (ctx.request.hasBody) {
     const body = await ctx.request.body();
     const { username, password } = await body.value;
@@ -38,10 +40,13 @@ userController.verifyUser = async (ctx: any) => {
       // if (await req)
 
       // password match - success && user exists
+      const id = user._id;
       ctx.response.body = {
         success: true,
         message: 'Successfully logged in!',
-      };
+        id,
+      }
+      await next();
     } else if (user) {
       // password mismatch - failure
       ctx.response.body = {
@@ -55,7 +60,6 @@ userController.verifyUser = async (ctx: any) => {
         message: 'no such user found',
       };
     }
-    console.log(user);
   } else {
     // user didn't input anything
     ctx.response.body = {
