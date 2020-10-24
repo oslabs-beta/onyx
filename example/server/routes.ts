@@ -1,19 +1,27 @@
-import { Router } from '../../deps.ts'
-import App from "../views/App.tsx";
-import userController from './controllers/authController.ts'
-import cookieController from './controllers/cookieController.ts';
+import { Router } from '../../deps.ts';
+import App from '../views/App.tsx';
+import userController from './controllers/authController.ts';
+import sessionController from './controllers/sessionController.ts';
 // import users from './models/userModels.ts'
 
 const router = new Router();
 
 router.get('/login', (ctx) => {
-    ctx.response.body = 'do a post request';
-    console.log('in login!')
-})
+  ctx.response.body = 'do a post request';
+  console.log('in login!');
+});
 
-router.post('/login', userController.verifyUser, cookieController.setCookie) 
+router.post(
+  '/login',
+  userController.verifyUser,
+  sessionController.startSession
+);
 
-router.post('/register', userController.createUser)
+router.post(
+  '/register',
+  userController.createUser,
+  sessionController.startSession
+);
 
 // this works too, more in the callback style of express
 // router.post('/login', async(ctx) {
