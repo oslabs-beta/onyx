@@ -26,19 +26,35 @@ userController.createUser = async (ctx: any, next: any) => {
   // ctx.response.body = {...ctx.response.body,
   //   message3: 'hello from createUser again'
   // }
+<<<<<<< HEAD
 }
 
 userController.verifyUser = async(ctx: any) => {
+=======
+};
+
+userController.verifyUser = async (ctx: any, next: any) => {
+>>>>>>> ab3dc21c2581549285582dd4e21672903cf09daa
   if (ctx.request.hasBody) {
     const body = await ctx.request.body();
     const { username, password } = await body.value;
     const user = await User.findOne({ username });
     if (user && password === user.password) {
       // password match - success && user exists
+<<<<<<< HEAD
       ctx.response.body = {
         success: true,
         message: 'Successfully logged in!',
       }
+=======
+      const id = user._id.$oid;
+      ctx.response.body = {
+        success: true,
+        message: 'Successfully logged in!',
+        id,
+      };
+      await next();
+>>>>>>> ab3dc21c2581549285582dd4e21672903cf09daa
     } else if (user) {
       // password mismatch - failure
       ctx.response.body = {
