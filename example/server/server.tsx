@@ -6,6 +6,7 @@ import router from './routes.ts';
 import App from '../views/App.tsx';
 import Inputs from '../views/components/Inputs.tsx';
 import sessionController from './controllers/sessionController.ts';
+import { connect } from "https://denopkg.com/keroxp/deno-redis/mod.ts";
 
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
