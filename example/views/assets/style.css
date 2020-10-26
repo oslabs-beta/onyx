@@ -1,12 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #b3b3b3;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #b3b3b3;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #b3b3b3;
+}
+
 body {
-  background-color: cornflowerblue;
+  background-color: #333333;
+}
+
+.everything {
+  margin-top: 80px;
+}
+
+.initial {
+  background-image: url('https://i.imgur.com/SvOsXcq.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 500px auto;
+  height: 650px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-border {
+  position: relative;
+  margin-right: 7px;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+  border: 1.8px solid white;
+  border-radius: 17px;
+  width: 350px;
+  height: 48px;
+  transition: box-shadow 0.3s;
+  background-color: white;
+}
+
+.input-border:hover {
+  box-shadow: 0 0 10px white;
 }
 
 .input-field {
-  border-radius: 5px;
-  transition: box-shadow 0.3s;
+  position: absolute;
+  left: 35px;
+  top: 9px;
+  width: 275px;
+  outline: none;
+  border: none;
+  background-color: white;
+
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16pt;
+  color: black;
 }
 
-.input-field:hover {
-  box-shadow: 0 0 10px #ffff00;
+.buttonDiv {
+  margin-right: 7px;
+  display: flex;
+  width: 350px;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.buttons {
+  padding-bottom: 12px;
+  padding-top: 10px;
+  border: 2.2px solid white;
+  border-radius: 17px;
+  font-size: 16pt;
+  font-family: 'Montserrat', sans-serif;
+  color: white;
+  width: 150px;
+  text-align: center;
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+.buttons:hover {
+  background-color: white;
+  color: black;
+}
+
