@@ -40,46 +40,52 @@ const Inputs: any = () => {
   };
 
   return (
-    <>
+    <div className="everything">
       <div className="inputs">
-        <input
-          className="input-field"
-          id="input-username"
-          type="text"
-          value={username}
-          onChange={usernameOnChange}
-          placeholder="Username"
-        ></input>
+        <div className="input-border">
+          <input
+            className="input-field"
+            id="input-username"
+            type="text"
+            value={username}
+            onChange={usernameOnChange}
+            placeholder="Username"
+          ></input>
+        </div>
         <p></p>
-        <input
-          className="input-field"
-          id="input-password"
-          type="password"
-          value={password}
-          onChange={passwordOnChange}
-          placeholder="Password"
-        ></input>
+        <div className="input-border">
+          <input
+            className="input-field"
+            id="input-password"
+            type="password"
+            value={password}
+            onChange={passwordOnChange}
+            placeholder="Password"
+          ></input>
+        </div>
         <p></p>
       </div>
-      <div className="buttons">
-        <button
+      <div className="buttonDiv">
+        <div
           id="login"
+          className="buttons"
           onClick={(evt: any) => {
             submit(evt.target.id);
           }}
         >
           Log in
-        </button>
-        <button
+        </div>
+        <div
           id="register"
+          className="buttons"
           onClick={(evt: any) => {
             submit(evt.target.id);
           }}
         >
-          Sign Up
-        </button>
+          Sign up
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
