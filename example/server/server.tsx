@@ -53,14 +53,15 @@ app.use(async (ctx) => {
     await ctx.state.session._session._store._sessionRedisStore.get(sidCookie)
   ).userIDKey;
 
-  const user_id5 = await ctx.state.session.get('userIDKey');
+  const user_id5 = await ctx.state.session.get('userIDKey'); // THIS IS THE CORRECT SYNTAX FOR BOTH MEMORY AND REDIS
+
   console.log(
     `${filePath}: ${sidCookie} with ${user_id} or ${user_id2} or ${user_id3} or ${user_id4} or ${user_id5}`
   );
   // 1e9c7684-0a3b-4bb7-84c5-bf30560916d2 with undefined or {"userIDKey":"5f90c2bf007eea950017b09d"} or 5f90c2bf007eea950017b09d or 5f90c2bf007eea950017b09d or 5f90c2bf007eea950017b09d
 
+  // if user_id is fround, should we
   if (filePath === '/') {
-    // await sessionController.checkSession(ctx);
     ctx.response.type = `text/html`;
     ctx.response.body = html;
   } else if (filePath === browserBundlePath) {
