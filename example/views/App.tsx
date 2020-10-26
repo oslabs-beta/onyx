@@ -8,6 +8,7 @@ declare global {
     namespace JSX {
       interface IntrinsicElements {
         button: any;
+        img: any;
         input: any;
         div: any;
         h1: any;
@@ -18,11 +19,9 @@ declare global {
 
 const App = () => {
    return (
-     <>
-      <h1>Wanna sign up??</h1>
-      <p></p>
+     <div className="initial">
       <Inputs />
-     </>
+     </div>
    ) 
 }
 
