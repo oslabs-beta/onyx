@@ -9,15 +9,16 @@ import Inputs from '../views/components/Inputs.tsx';
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
 
-// session
-// const session = new Session({ framework: 'oak' });
+// session for Server Memory
+const session = new Session({ framework: 'oak' });
 
-const session = new Session({
-  framework: 'oak',
-  store: 'redis',
-  hostname: '127.0.0.1',
-  port: 6379,
-});
+// // session from Redis Memory
+// const session = new Session({
+//   framework: 'oak',
+//   store: 'redis',
+//   hostname: '127.0.0.1',
+//   port: 6379,
+// });
 
 await session.init();
 app.use(session.use()(session)); // session code has bug where it's not taking the 2nd argument as cookie config options
@@ -42,23 +43,9 @@ app.use(router.allowedMethods());
 app.use(async (ctx) => {
   const filePath = ctx.request.url.pathname;
   const sidCookie = await ctx.cookies.get('sid');
-  const user_id = await ctx.state.session.get(sidCookie); // this is returning undefined even after log in with redis
+  const user_id = await ctx.state.session.get('userIDKey');
 
-  const user_id2 = await ctx.state.session._session._store._sessionRedisStore.get(
-    sidCookie
-  ); // this is returning an object with key 'userIDKey'
-  const user_id3 = JSON.parse(user_id2).userIDKey;
-
-  const user_id4 = JSON.parse(
-    await ctx.state.session._session._store._sessionRedisStore.get(sidCookie)
-  ).userIDKey;
-
-  const user_id5 = await ctx.state.session.get('userIDKey'); // THIS IS THE CORRECT SYNTAX FOR BOTH MEMORY AND REDIS
-
-  console.log(
-    `${filePath}: ${sidCookie} with ${user_id} or ${user_id2} or ${user_id3} or ${user_id4} or ${user_id5}`
-  );
-  // 1e9c7684-0a3b-4bb7-84c5-bf30560916d2 with undefined or {"userIDKey":"5f90c2bf007eea950017b09d"} or 5f90c2bf007eea950017b09d or 5f90c2bf007eea950017b09d or 5f90c2bf007eea950017b09d
+  console.log(`${filePath}: ${sidCookie} with ${user_id}`);
 
   // if user_id is fround, should we
   if (filePath === '/') {

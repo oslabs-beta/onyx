@@ -25,27 +25,23 @@ sessionController.startSession = async (ctx: any, next: any) => {
   // console.log('ctx.state.session after log in', ctx.state.session);
   console.log(
     'ctx.state.session after log in',
-    ctx.state.session._session._store._sessionRedisStore
+    ctx.state.session._session._store
   );
-
-  // for testing purpose only
-  // const sidCookie = await ctx.cookies.get('sid');
-
-  // await ctx.state.session._session._store._sessionRedisStore.del(sidCookie); // access the del method of deno-redis directly
-  // // ctx.state.session._session._store.deleteSession(sidCookie);
-  // // // delete ctx.state.session._session._store._sessionMemoryStore[sidCookie];
-  // // delete ctx.state.session._session._store._sessionMemoryStore[sidCookie];
-  // console.log(
-  //   'ctx.state.session after log out',
-  //   ctx.state.session._session._store._sessionRedisStore
-  // );
 };
 
 // log out the user
 sessionController.endSession = async (ctx: any, next: any) => {
   const sidCookie = await ctx.cookies.get('sid');
-  ctx.state.session._session._store.deleteSession(sidCookie);
+
+  // if using Redis for Session Store
+  if (ctx.state.session._session._store._sessionRedisStore) {
+    await ctx.state.session._session._store._sessionRedisStore.del(sidCookie);
+  }
+  // else if using Session Memory for Session Store
+  else ctx.state.session._session._store.deleteSession(sidCookie);
   // delete ctx.state.session._session._store._sessionMemoryStore[sidCookie];
+
+  // need to add in at the frontend a way log out and we will use this endSession
   console.log('ctx.state.session after log out', ctx.state.session);
 };
 
