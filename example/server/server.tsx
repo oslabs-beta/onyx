@@ -1,26 +1,26 @@
 // Line 2 imports Oak functionality
 import { Application, send, join, log } from '../../deps.ts';
-import { Session, SessionData } from '../../deps.ts';
+import { Session } from '../../deps.ts';
 import { React, ReactDOMServer } from '../../deps.ts';
 import router from './routes.ts';
 import App from '../views/App.tsx';
 import Inputs from '../views/components/Inputs.tsx';
-import sessionController from './controllers/sessionController.ts';
 
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
 
 // session
-const session = new Session({ framework: 'oak' });
+// const session = new Session({ framework: 'oak' });
+
+const session = new Session({
+  framework: 'oak',
+  store: 'redis',
+  hostname: '127.0.0.1',
+  port: 6379,
+});
+
 await session.init();
-app.use(
-  session.use()(session, {
-    path: '/w35235',
-    httpOnly: false,
-    secure: false, // not accessable via JS
-    // maxAge: 6000, //
-  })
-); // seems to be setting the sid cookie no matter what
+app.use(session.use()(session)); // session code has bug where it's not taking the 2nd argument as cookie config options
 
 const browserBundlePath: string = '/browser.js';
 
@@ -42,8 +42,23 @@ app.use(router.allowedMethods());
 app.use(async (ctx) => {
   const filePath = ctx.request.url.pathname;
   const sidCookie = await ctx.cookies.get('sid');
-  const user_id = await ctx.state.session.get(sidCookie);
-  console.log(`${filePath}: ${sidCookie} with ${user_id}`);
+  const user_id = await ctx.state.session.get(sidCookie); // this is returning undefined even after log in with redis
+
+  const user_id2 = await ctx.state.session._session._store._sessionRedisStore.get(
+    sidCookie
+  ); // this is returning an object with key 'userIDKey'
+  const user_id3 = JSON.parse(user_id2).userIDKey;
+
+  const user_id4 = JSON.parse(
+    await ctx.state.session._session._store._sessionRedisStore.get(sidCookie)
+  ).userIDKey;
+
+  const user_id5 = await ctx.state.session.get('userIDKey');
+  console.log(
+    `${filePath}: ${sidCookie} with ${user_id} or ${user_id2} or ${user_id3} or ${user_id4} or ${user_id5}`
+  );
+  // 1e9c7684-0a3b-4bb7-84c5-bf30560916d2 with undefined or {"userIDKey":"5f90c2bf007eea950017b09d"} or 5f90c2bf007eea950017b09d or 5f90c2bf007eea950017b09d or 5f90c2bf007eea950017b09d
+
   if (filePath === '/') {
     // await sessionController.checkSession(ctx);
     ctx.response.type = `text/html`;

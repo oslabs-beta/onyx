@@ -11,7 +11,7 @@ sessionController.checkSession = async (ctx: any, next: any) => {
   if (userIDVal) {
     ctx.response.body.id = userIDVal;
     // grab more user info from MongoDb?
-    ctx.redirect('success'); // redirect to successful login page
+    ctx.redirect('/success'); // redirect to successful login page
   } else {
     // no userIDVal found
     ctx.redirect('/'); // redirect to login page
@@ -22,12 +22,28 @@ sessionController.checkSession = async (ctx: any, next: any) => {
 sessionController.startSession = async (ctx: any, next: any) => {
   // in session-mod.ts, first argument is sessionVariableKey, second argument is sessionVariableValue
   await ctx.state.session.set('userIDKey', ctx.response.body.id);
-  console.log('ctx.state.session after log in', ctx.state.session);
+  // console.log('ctx.state.session after log in', ctx.state.session);
+  console.log(
+    'ctx.state.session after log in',
+    ctx.state.session._session._store._sessionRedisStore
+  );
+
+  // for testing purpose only
+  // const sidCookie = await ctx.cookies.get('sid');
+
+  // await ctx.state.session._session._store._sessionRedisStore.del(sidCookie); // access the del method of deno-redis directly
+  // // ctx.state.session._session._store.deleteSession(sidCookie);
+  // // // delete ctx.state.session._session._store._sessionMemoryStore[sidCookie];
+  // // delete ctx.state.session._session._store._sessionMemoryStore[sidCookie];
+  // console.log(
+  //   'ctx.state.session after log out',
+  //   ctx.state.session._session._store._sessionRedisStore
+  // );
 };
 
 // log out the user
 sessionController.endSession = async (ctx: any, next: any) => {
-  const sidCookie = await ctx.cookie.get('sid');
+  const sidCookie = await ctx.cookies.get('sid');
   ctx.state.session._session._store.deleteSession(sidCookie);
   // delete ctx.state.session._session._store._sessionMemoryStore[sidCookie];
   console.log('ctx.state.session after log out', ctx.state.session);
