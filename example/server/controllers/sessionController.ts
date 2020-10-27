@@ -1,5 +1,3 @@
-import { stringToBytes } from 'https://deno.land/std@0.74.0/uuid/_common.ts';
-
 const sessionController: any = {};
 
 // is the user logged in already
@@ -11,7 +9,7 @@ sessionController.checkSession = async (ctx: any, next: any) => {
   if (userIDVal) {
     ctx.response.body.id = userIDVal;
     // grab more user info from MongoDb?
-    ctx.redirect('success'); // redirect to successful login page
+    ctx.redirect('/success'); // redirect to successful login page
   } else {
     // no userIDVal found
     ctx.redirect('/'); // redirect to login page
@@ -22,14 +20,26 @@ sessionController.checkSession = async (ctx: any, next: any) => {
 sessionController.startSession = async (ctx: any, next: any) => {
   // in session-mod.ts, first argument is sessionVariableKey, second argument is sessionVariableValue
   await ctx.state.session.set('userIDKey', ctx.response.body.id);
-  console.log('ctx.state.session after log in', ctx.state.session);
+  // console.log('ctx.state.session after log in', ctx.state.session);
+  console.log(
+    'ctx.state.session after log in',
+    ctx.state.session._session._store
+  );
 };
 
 // log out the user
 sessionController.endSession = async (ctx: any, next: any) => {
-  const sidCookie = await ctx.cookie.get('sid');
-  ctx.state.session._session._store.deleteSession(sidCookie);
+  const sidCookie = await ctx.cookies.get('sid');
+
+  // if using Redis for Session Store
+  if (ctx.state.session._session._store._sessionRedisStore) {
+    await ctx.state.session._session._store._sessionRedisStore.del(sidCookie);
+  }
+  // else if using Session Memory for Session Store
+  else ctx.state.session._session._store.deleteSession(sidCookie);
   // delete ctx.state.session._session._store._sessionMemoryStore[sidCookie];
+
+  // need to add in at the frontend a way log out and we will use this endSession
   console.log('ctx.state.session after log out', ctx.state.session);
 };
 

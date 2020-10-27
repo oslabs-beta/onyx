@@ -1,26 +1,31 @@
 // Line 2 imports Oak functionality
-import { Application, send, join, log } from '../../deps.ts';
-import { Session, SessionData } from '../../deps.ts';
-import { React, ReactDOMServer } from '../../deps.ts';
+import { Application, send, join, log } from '../deps.ts';
+import { Session } from '../deps.ts';
+import { React, ReactDOMServer } from '../deps.ts';
 import router from './routes.ts';
 import App from '../views/App.tsx';
 import Inputs from '../views/components/Inputs.tsx';
-import sessionController from './controllers/sessionController.ts';
 
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
 
-// session
+// session for Server Memory
 const session = new Session({ framework: 'oak' });
+
+// // session from Redis Memory
+// const session = new Session({
+//   framework: 'oak',
+//   store: 'redis',
+//   hostname: '127.0.0.1',
+//   port: 6379,
+// });
+
 await session.init();
-app.use(
-  session.use()(session, {
-    path: '/w35235',
-    httpOnly: false,
-    secure: false, // not accessable via JS
-    // maxAge: 6000, //
-  })
-); // seems to be setting the sid cookie no matter what
+app.use(session.use()(session)); // session code has bug where it's not taking the 2nd argument as cookie config options
+
+// import Onyx from '../../src/onyx.ts';
+// const onyx = new Onyx();
+// app.use(onyx.initialize());
 
 const browserBundlePath: string = '/browser.js';
 
@@ -42,10 +47,12 @@ app.use(router.allowedMethods());
 app.use(async (ctx) => {
   const filePath = ctx.request.url.pathname;
   const sidCookie = await ctx.cookies.get('sid');
-  const user_id = await ctx.state.session.get(sidCookie);
+  const user_id = await ctx.state.session.get('userIDKey');
+
   console.log(`${filePath}: ${sidCookie} with ${user_id}`);
+
+  // if user_id is fround, should we
   if (filePath === '/') {
-    // await sessionController.checkSession(ctx);
     ctx.response.type = `text/html`;
     ctx.response.body = html;
   } else if (filePath === browserBundlePath) {

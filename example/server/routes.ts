@@ -1,4 +1,4 @@
-import { Router } from '../../deps.ts';
+import { Router } from '../deps.ts';
 import App from '../views/App.tsx';
 import userController from './controllers/authController.ts';
 import sessionController from './controllers/sessionController.ts';
