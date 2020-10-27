@@ -1,7 +1,7 @@
 // Line 2 imports Oak functionality
-import { Application, send, join, log } from '../../deps.ts';
-import { Session } from '../../deps.ts';
-import { React, ReactDOMServer } from '../../deps.ts';
+import { Application, send, join, log } from '../deps.ts';
+import { Session } from '../deps.ts';
+import { React, ReactDOMServer } from '../deps.ts';
 import router from './routes.ts';
 import App from '../views/App.tsx';
 import Inputs from '../views/components/Inputs.tsx';
@@ -22,6 +22,10 @@ const session = new Session({ framework: 'oak' });
 
 await session.init();
 app.use(session.use()(session)); // session code has bug where it's not taking the 2nd argument as cookie config options
+
+// import Onyx from '../../src/onyx.ts';
+// const onyx = new Onyx();
+// app.use(onyx.initialize());
 
 const browserBundlePath: string = '/browser.js';
 

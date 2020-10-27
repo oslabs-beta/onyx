@@ -1,5 +1,3 @@
-import { stringToBytes } from 'https://deno.land/std@0.74.0/uuid/_common.ts';
-
 const sessionController: any = {};
 
 // is the user logged in already

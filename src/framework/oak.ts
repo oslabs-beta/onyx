@@ -1,11 +1,31 @@
-// what properties should the onyx namespace have?
-interface Onyx {
-  session: object;
-}
+import { Context } from 'https://deno.land/x/oak@v6.3.1/context.ts';
+import Strategy from '../strategy.ts';
+import Onyx from '../onyx.ts';
 
-export default function initialize(onyx: any) {
+// what properties should the onyx namespace have?
+// interface Onyx {
+//   session: object;
+//   _onyx: any;
+// }
+
+// class Onyx {
+//   constructor(onyx: any) {
+//     this._onyx = onyx;
+//   }
+
+//   // functions that we want to add to context.state.onyx
+// }
+
+// export default class test {
+//   constructor() {}
+//   initialize = () => {
+//     return async (context: any, next: any) => {};
+//   };
+// }
+
+export default function initialize(onyx: any, options?: any) {
   return async (context: any, next: any) => {
-    context.state.onyx = new Onyx(onyx);
+    context.state.onyx = new Onyx();
 
     // if session entry exist, load data from that
     const userIDVal = await context.state.session.get('userIDKey');
@@ -41,3 +61,8 @@ export default function initialize(onyx: any) {
 //     await next();
 //   };
 // }
+
+// from failure of local-strategy.ts
+// context.state.onyx.isFailure = true;
+
+// req.session.messages = req.session.messages || [];

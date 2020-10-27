@@ -1,4 +1,4 @@
-import { React } from '../../../deps.ts';
+import { React } from '../../deps.ts';
 
 const Inputs: any = () => {
   const [username, setUsername] = (React as any).useState('');
