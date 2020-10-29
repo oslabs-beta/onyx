@@ -18,6 +18,7 @@ export default class Onyx {
       // this.serializeUser
       this.serializeUser.bind(this)
       /*, { key: this._key } */
+      // this.funcs
     );
   }
 
@@ -62,8 +63,9 @@ export default class Onyx {
       return (this.funcs.serializer = fn);
     }
     // else console.log('fn is user', fn);
-
+    // else return this.funcs.serializer;
     // const user = fn;
+    else return this.funcs.serializer;
     // console.log('this.funcs', this.funcs);
   }
 
@@ -79,7 +81,8 @@ export default class Onyx {
   // when onyx is initialize in server 60, will check session db for session
   initialize(onyx: any) {
     return async (context: any, next: Function) => {
-      context.state.onyx = new Onyx();
+      // context.state.onyx = new Onyx();
+      context.state.onyx = onyx;
 
       // if session entry exist, load data from that
       const userIDVal = await context.state.session.get('userIDKey');
