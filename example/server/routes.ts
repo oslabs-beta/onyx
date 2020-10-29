@@ -11,11 +11,25 @@ router.get('/login', (ctx) => {
   console.log('in login!');
 });
 
-router.post(
-  '/login',
-  userController.verifyUser,
-  sessionController.startSession
-);
+// router.post('/login', (ctx) => {
+//   ctx.state.onyx.authenticate('local', { message: 'hi' }, (ctx: any) => {
+//     console.log(ctx);
+//   });
+// });
+
+//   userController.verifyUser,
+//   sessionController.startSession
+// );
+
+// passport.use(new LocalStrategy(
+// (username, password, done) => {
+//    if(username === 'test@gmail.com' && password === '1234') {
+//        return done(null, {username: 'test@gmail.com'});
+//    } else {
+//        return done(null, false);
+//    }
+// }
+// ));
 
 router.post(
   '/register',
