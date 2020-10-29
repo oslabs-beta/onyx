@@ -1,8 +1,10 @@
 import { React } from '../../deps.ts';
+import Message from './Message.tsx';
 
 const Inputs: any = () => {
   const [username, setUsername] = (React as any).useState('');
   const [password, setPassword] = (React as any).useState('');
+  const [message, setMessage] = (React as any).useState(''); 
 
   const usernameOnChange = (e: any) => {
     setUsername(e.target.value);
@@ -28,11 +30,9 @@ const Inputs: any = () => {
     })
       .then((data) => data.json())
       .then((data) => {
-        if (!data.success) {
-          console.log(data.message);
-        } else {
-          console.log(data);
-        }
+        setMessage(data.success);
+        setUsername('');
+        setPassword('');
       })
       .catch((e) => {
         console.log(e);
@@ -85,6 +85,8 @@ const Inputs: any = () => {
           Sign up
         </div>
       </div>
+      <p></p>
+      <Message success={message} />
     </div>
   );
 };
