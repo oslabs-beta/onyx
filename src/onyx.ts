@@ -4,17 +4,25 @@ import Strategy from './strategy.ts';
 export default class Onyx {
   private _sm: any;
   private _strategies: any;
-  // an object with the strategy.name as the key and the strategy as value, ie 'local' and LocalStrategy
+  public funcs: any;
 
-  constructor() {}
+  constructor() {
+    // this.init()
+    this._strategies = {};
+    this.init();
+    this.funcs = {};
+  }
 
   init() {
     this._sm = new SessionManager(
-      this.serializeUser.bind(this) /*, { key: this._key } */
+      // this.serializeUser
+      this.serializeUser.bind(this)
+      /*, { key: this._key } */
     );
   }
 
   // app.post('/login', passport.authenticate('local', {failureRedirect:'/login', successRedirect: '/dashboard'}))
+
   // *     passport.use(new TwitterStrategy(...));  // strategy.name = 'twitter'
   // *     passport.use(new GitHubStrategy(...))
   // *     passport.use('api', new http.BasicStrategy(...)); 'basic'  'api'
@@ -31,26 +39,61 @@ export default class Onyx {
     return this;
   }
 
-  authenticate() {}
+  authenticate(strategy: string, options: any, callback: Function) {
+    if (!strategy) {
+      throw new Error(
+        'You must provide an authentication strategy as an argment.'
+      );
+    }
 
-  serializeUser() {}
+    const currStrat = this._strategies[strategy];
+    if (!currStrat) {
+      throw new Error(
+        "The argued strategy is not a valid strategy. Did you remember to invoke 'onyx.use'?"
+      );
+    }
+    console.log('hello from onyx.authenticate with currStrat', currStrat);
+    return currStrat.authenticate;
+  }
 
-  deserializeUser() {}
+  serializeUser(fn?: any, context?: any) {
+    if (typeof fn === 'function') {
+      console.log('in serializeUser of onyx.ts');
+      return (this.funcs.serializer = fn);
+    }
+    // else console.log('fn is user', fn);
+
+    // const user = fn;
+    // console.log('this.funcs', this.funcs);
+  }
+
+  // onyx.deserializeUser((username, done) => {
+  //   done(null, {username: username});
+  // });
+  deserializeUser(fn: Function) {
+    console.log('in deserializeUser of onyx.ts');
+    this.funcs.deserializer = fn;
+  }
+
+  // if session found in memory or redis,  adding session to ctx.state.onyx
+  // when onyx is initialize in server 60, will check session db for session
+  initialize(onyx: any) {
+    return async (context: any, next: Function) => {
+      context.state.onyx = new Onyx();
+
+      // if session entry exist, load data from that
+      const userIDVal = await context.state.session.get('userIDKey');
+
+      if (userIDVal) {
+        if (!context.state.onyx.session) context.state.onyx.session = {};
+        context.state.onyx.session.userID = userIDVal;
+        console.log(
+          'session found! info saved in context.state.onyx.session',
+          context.state.onyx.session
+        );
+      }
+
+      await next();
+    };
+  }
 }
-
-// Authenticator.prototype.init = function () {
-//   this.framework(require('./framework/connect')());
-//   this.use(new SessionStrategy(this.deserializeUser.bind(this)));
-//   this._sm = new SessionManager(
-//     { key: this._key },
-//     this.serializeUser.bind(this)
-//   );
-// };
-
-// passport.serializeUser(function(user, done) {
-//   done(null, user.username);
-// });
-
-// passport.deserializeUser((username, done) => {
-//   done(null, {username: username});
-// });
