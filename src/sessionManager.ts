@@ -4,22 +4,68 @@ export default class SessionManager {
   private _key: string;
   private _serializeUser: Function;
 
+  // constructor(serializeUser: Function, options?: any) {
   constructor(serializeUser: Function, options?: any) {
-    this._key = options.key || 'sid';
+    this._key = 'sid';
     this._serializeUser = serializeUser;
   }
 
-  logIn = async (context: any, user: any, cb: Function) => {
-    // example of serializeUser:
-    //        passport.serializeUser(function(user, done) {
-    //  *       done(null, user.id);
-    //  *     });
-    this._serializeUser(user, context, async function (err: any, obj: Object) {
+  logIn = async (context: any, user: any, onyx: any, cb: Function) => {
+    // cb (err, next)
+
+    // in server, developer will define where the id is located on the user object and pass that as 2nd arg in done
+    // onyx.serializeUser(function(user, done) {
+    //    done(null, user.id);
+    // });
+
+    // this is from passing onyx in as arg2 on server 165
+    console.log(onyx.funcs.serializer);
+
+    onyx.funcs.serializer(user, async (err: any, id: any) => {
       if (err) {
         return cb(err);
       }
-      // check if session for user exists, if not
+      if (!context.state.onyx.session) {
+        context.state.onyx.session = {};
+      }
+      console.log('what is id?', id);
+
+      // what's the point of saving it to this when we're just going to redirect user?
+      context.state.onyx.session.userID = id;
+
+      // starting session
+      context.state.session.set('userIDKey', id);
+
+      const userIDVal = await context.state.session.get('userIDKey');
+      console.log('session set for user', userIDVal);
+
+      // testing purpose only, logOut
+      // await this.logOut(context);
+      // const userIDVal2 = await context.state.session.get('userIDKey');
+      // console.log('after logOut, is there session?', userIDVal2);
+      cb();
     });
+  };
+
+  logOut = async (context: any, cb?: Function) => {
+    if (context.state.onyx && context.state.onyx.session) {
+      delete context.state.onyx.session.userID;
+
+      const sidCookie = await context.cookies.get('sid');
+
+      // if using Redis Memory for Session Store
+      if (context.state.session._session._store._sessionRedisStore) {
+        await context.state.session._session._store._sessionRedisStore.del(
+          sidCookie
+        );
+      }
+      // else if using Server Memory for Session Store
+      else context.state.session._session._store.deleteSession(sidCookie);
+
+      // Redis Memory untested. Server Memory will actually delete the entire entry with the sidCookie key. Should we try figure out how to remove just the UserIDKey property instead?
+    }
+    // WHAT IS THIS?????
+    // cb && cb();
   };
 }
 
@@ -68,66 +114,7 @@ export default class SessionManager {
 //     if (req._passport && req._passport.session) {
 //       delete req._passport.session.user;
 //     }
-//     cb && cb();
+//     cb && cb();  // ???????????
 //   }
 
 //   module.exports = SessionManager;
-
-/**
- * Registers a function used to serialize user objects into the session.
- *
- * Examples:
- *
- *     passport.serializeUser(function(user, done) {
- *       done(null, user.id);
- *     });
- *
- * @api public
- */
-Authenticator.prototype.serializeUser = function (fn, req, done) {
-  if (typeof fn === 'function') {
-    return this._serializers.push(fn);
-  }
-
-  // private implementation that traverses the chain of serializers, attempting
-  // to serialize a user
-  var user = fn;
-
-  // For backwards compatibility
-  if (typeof req === 'function') {
-    done = req;
-    req = undefined;
-  }
-
-  var stack = this._serializers;
-  (function pass(i, err, obj) {
-    // serializers use 'pass' as an error to skip processing
-    if ('pass' === err) {
-      err = undefined;
-    }
-    // an error or serialized object was obtained, done
-    if (err || obj || obj === 0) {
-      return done(err, obj);
-    }
-
-    var layer = stack[i];
-    if (!layer) {
-      return done(new Error('Failed to serialize user into session'));
-    }
-
-    function serialized(e, o) {
-      pass(i + 1, e, o);
-    }
-
-    try {
-      var arity = layer.length;
-      if (arity == 3) {
-        layer(req, user, serialized);
-      } else {
-        layer(user, serialized);
-      }
-    } catch (e) {
-      return done(e);
-    }
-  })(0);
-};
