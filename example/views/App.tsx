@@ -1,6 +1,6 @@
 import { React } from '../deps.ts';
 import Inputs from './components/Inputs.tsx';
-// import './assets/style.css'
+
 
 // Typescript demands that we define the typing for each JSX element,
 // so this global interface defines the 'any' typing for whatever elements we may need
@@ -19,9 +19,11 @@ declare global {
 
 const App = () => {
   return (
-    <div className="initial">
+  <div className="page">
+    <div id="formBox">
       <Inputs />
     </div>
+  </div>
   );
 };
 

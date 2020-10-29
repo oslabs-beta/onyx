@@ -13,19 +13,29 @@
 }
 
 body {
-  background-color: #333333;
+  background-image: url('https://i.imgur.com/Ij90P0z.jpg');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 2000px auto;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .everything {
   margin-top: 80px;
 }
 
-.initial {
+#formBox {
   background-image: url('https://i.imgur.com/SvOsXcq.png');
   background-position: center;
   background-repeat: no-repeat;
   background-size: 500px auto;
   height: 650px;
+  width: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -90,3 +100,14 @@ body {
   color: black;
 }
 
+.message {
+  margin-top: 35px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 12pt;
+  font-family: 'Montserrat', sans-serif;
+}
