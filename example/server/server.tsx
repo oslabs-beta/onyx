@@ -74,10 +74,12 @@ onyx.deserializeUser(async function (id: string, cb: Function) {
   // we'll use the id (from session or onyx?) and go inside the mongoDB to find the user object
 
   const _id = { $oid: id };
+
   try {
     const user = await User.findOne({ _id });
     if (!user) {
-      cb(user);
+      // cb(user);
+      throw new Error('not in db');
     } else {
       cb(null, user);
     }
