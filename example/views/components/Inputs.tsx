@@ -28,7 +28,7 @@ const Inputs: any = () => {
     })
       .then((data) => data.json())
       .then((data) => {
-        if (!data.sucess) {
+        if (!data.success) {
           console.log(data.message);
         } else {
           console.log(data);
