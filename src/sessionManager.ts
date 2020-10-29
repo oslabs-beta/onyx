@@ -59,8 +59,10 @@ export default class SessionManager {
           sidCookie
         );
       }
-      // else if using Session Memory for Session Store
+      // else if using Server Memory for Session Store
       else context.state.session._session._store.deleteSession(sidCookie);
+
+      // Redis Memory untested. Server Memory will actually delete the entire entry with the sidCookie key. Should we try figure out how to remove just the UserIDKey property instead?
     }
     // WHAT IS THIS?????
     // cb && cb();
