@@ -62,7 +62,7 @@ onyx.use(new LocalStrategy(userController.verifyUser));
 
 // app.use(async (ctx: any, next) => {
 onyx.serializeUser(async function (user: any, cb: Function) {
-  // developer will specify the user id in the user object
+  // developer will specify the user id in the user object  //user  //user.id
   cb(null, user._id.$oid);
 });
 //   await next();

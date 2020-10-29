@@ -3,20 +3,27 @@
 export default class SessionManager {
   private _key: string;
   private _serializeUser: Function;
+  // private _funcs: any;
 
-  // constructor(serializeUser: Function, options?: any) {
   constructor(serializeUser: Function, options?: any) {
+    // constructor(funcs: object, options?: any) {
     this._key = 'sid';
     this._serializeUser = serializeUser;
+    // this._funcs = funcs;
   }
 
+  // onyx.authenticate() will invoke this on /login path, but on /register path developer will have to invoke this function using context.state.onyx._sm.logIn ---- would be better if we can add to context.logIn or something similar
   logIn = async (context: any, user: any, onyx: any, cb: Function) => {
-    // cb (err, next)
-
     // in server, developer will define where the id is located on the user object and pass that as 2nd arg in done
     // onyx.serializeUser(function(user, done) {
     //    done(null, user.id);
     // });
+
+    // in onyx initialize, fixed so that context.state.onyx is the onyx object created in the server and not a new instance of Onyx.  so now calling for the serializeUser function will be in the instance of onyx that has the funcs property with the serializer and deserializer
+    const serializer = await this._serializeUser();
+    console.log(serializer);
+
+    // console.log('funcs are', this._funcs);  // funcs are undefine
 
     // this is from passing onyx in as arg2 on server 165
     console.log(onyx.funcs.serializer);
@@ -41,12 +48,12 @@ export default class SessionManager {
 
       // testing purpose only, logOut
       // await this.logOut(context);
-      // const userIDVal2 = await context.state.session.get('userIDKey');
-      // console.log('after logOut, is there session?', userIDVal2);
+
       cb();
     });
   };
 
+  // developer has to invoke this using context.state.onyx._sm.logOut()
   logOut = async (context: any, cb?: Function) => {
     if (context.state.onyx && context.state.onyx.session) {
       delete context.state.onyx.session.userID;
@@ -64,8 +71,9 @@ export default class SessionManager {
 
       // Redis Memory untested. Server Memory will actually delete the entire entry with the sidCookie key. Should we try figure out how to remove just the UserIDKey property instead?
     }
-    // WHAT IS THIS?????
-    // cb && cb();
+
+    // If the callback exists? --> Invoke it
+    cb && cb();
   };
 }
 
