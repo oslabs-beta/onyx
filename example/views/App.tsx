@@ -1,9 +1,7 @@
 import { React } from '../deps.ts';
-import Inputs from './components/Inputs.tsx';
+import MainContainer from './components/MainContainer.tsx';
+import NavBar from './components/NavBar.tsx';
 
-
-// Typescript demands that we define the typing for each JSX element,
-// so this global interface defines the 'any' typing for whatever elements we may need
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -12,18 +10,20 @@ declare global {
       input: any;
       div: any;
       h1: any;
+      h3: any;
       p: any;
     }
   }
 }
 
 const App = () => {
+  const [page, setPage] = (React as any).useState('home');
+
   return (
-  <div className="page">
-    <div id="formBox">
-      <Inputs />
+    <div className="app">
+      <NavBar setPage={setPage} />
+      <MainContainer page={page} />
     </div>
-  </div>
   );
 };
 
