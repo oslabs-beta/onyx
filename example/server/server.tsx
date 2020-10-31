@@ -11,6 +11,10 @@ import { React, ReactDOMServer } from '../deps.ts';
 import App from '../views/App.tsx';
 import Inputs from '../views/components/Inputs.tsx';
 import Message from '../views/components/Message.tsx';
+import Main from '../views/components/Main.tsx';
+import MainContainer from '../views/components/MainContainer.tsx';
+import NavBar from '../views/components/NavBar.tsx';
+import Protected from '../views/components/Protected.tsx';
 
 // Onyx Middlewares
 import LocalStrategy from '../../src/strategies/local-strategy.ts';
@@ -18,6 +22,52 @@ import Onyx from '../../src/onyx.ts';
 
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
+
+// session for Server Memory
+const session = new Session({ framework: 'oak' });
+
+// // session from Redis Memory
+// const session = new Session({
+//   framework: 'oak',
+//   store: 'redis',
+//   hostname: '127.0.0.1',
+//   port: 6379,
+// });
+
+// Initialize Session
+await session.init();
+
+const onyx = new Onyx();
+
+// saving the LocalStrategy onto onyx._strategies['local'] to be invoked in onyx.authenticate('local')
+onyx.use(new LocalStrategy(userController.verifyUser));
+// onyx.use(other strategies)
+
+// developer will provide the serializer and deserializer functions that will specify the user id property to save in session db and the _id to query the user db for
+onyx.serializeUser(async function (user: any, cb: Function) {
+  // developer will specify the user id in the user object  //user  //user.id
+  cb(null, user._id.$oid);
+});
+
+onyx.deserializeUser(async function (id: string, cb: Function) {
+  console.log('deserializing');
+
+  // we'll use the id (from session or onyx?) and go inside the mongoDB to find the user object
+
+  const _id = { $oid: id };
+
+  try {
+    const user = await User.findOne({ _id });
+    if (!user) {
+      // cb(user);
+      throw new Error('not in db');
+    } else {
+      cb(null, user);
+    }
+  } catch (error) {
+    cb(error);
+  }
+});
 
 // Error Notification
 app.addEventListener('error', (event) => {
@@ -37,59 +87,13 @@ app.use(async (ctx, next) => {
   }
 });
 
-// session for Server Memory
-const session = new Session({ framework: 'oak' });
-
-// session from Redis Memory
-// const session = new Session({
-//   framework: 'oak',
-//   store: 'redis',
-//   hostname: '127.0.0.1',
-//   port: 6379,
-// });
-
-// Initialize Session
-await session.init();
-
 // Creates the ctx.state.session property & generate SID and set cookies
+// session.use returns an async function and also has await next()
 app.use(session.use()(session));
 // session code has bug where it's not taking the 2nd argument as cookie config options
 
-const onyx = new Onyx();
-
-// app.use(async (ctx) => onyx.initialize(ctx));
+// onyx.initialize(onyx) returnes a async function
 app.use(onyx.initialize(onyx));
-onyx.use(new LocalStrategy(userController.verifyUser));
-
-// app.use(async (ctx: any, next) => {
-onyx.serializeUser(async function (user: any, cb: Function) {
-  // developer will specify the user id in the user object  //user  //user.id
-  cb(null, user._id.$oid);
-});
-//   await next();
-// });
-// app.use(async (ctx: any, next) => {
-onyx.deserializeUser(async function (id: string, cb: Function) {
-  console.log('this is deserializer function, idk what to add');
-
-  // we'll use the id (from session or onyx?) and go inside the mongoDB to find the user object
-
-  const _id = { $oid: id };
-
-  try {
-    const user = await User.findOne({ _id });
-    if (!user) {
-      // cb(user);
-      throw new Error('not in db');
-    } else {
-      cb(null, user);
-    }
-  } catch (error) {
-    cb(error);
-  }
-});
-//   await next();
-// });
 
 // Track response time in headers of responses
 app.use(async (ctx, next) => {
@@ -116,7 +120,6 @@ app.use(async (ctx, next) => {
       ctx.response.body = {
         success: true,
         message: user,
-        test: 'inside no errorMessage if statement',
       };
     } else {
       const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
@@ -127,6 +130,10 @@ app.use(async (ctx, next) => {
     }
   }
 });
+
+// router
+app.use(router.routes());
+app.use(router.allowedMethods());
 
 const browserBundlePath: string = '/browser.js';
 
@@ -139,21 +146,20 @@ const js: string = `import React from "https://dev.jspm.io/react@16.14.0";
   \nimport ReactDOM from "https://dev.jspm.io/react-dom@16.14.0";
   \nconst Message = ${Message};
   \nconst Inputs = ${Inputs};
+  \nconst Protected = ${Protected};
+  \nconst Main = ${Main};
+  \nconst NavBar = ${NavBar};
+  \nconst MainContainer = ${MainContainer};
   \nReactDOM.hydrate(React.createElement(${App}), document.getElementById("root"));`;
-
-// router
-app.use(router.routes());
-app.use(router.allowedMethods());
 
 app.use(async (ctx) => {
   const filePath = ctx.request.url.pathname;
-  const sidCookie = await ctx.cookies.get('sid');
-  const user_id = await ctx.state.session.get('userIDKey');
   const method = ctx.request.method;
 
+  const sidCookie = await ctx.cookies.get('sid');
+  const user_id = await ctx.state.session.get('userIDKey');
   console.log(`${filePath}: ${sidCookie} with ${user_id}`);
 
-  // if user_id is fround, should we
   if (filePath === '/') {
     ctx.response.type = `text/html`;
     ctx.response.body = html;
@@ -166,10 +172,27 @@ app.use(async (ctx) => {
       root: join(Deno.cwd(), 'example/views/assets'),
     });
   } else if (method === 'POST' && filePath === '/login') {
-    // console.log('before onyx.authenticate, onyx is', onyx);
+    // onyx.authenticate returns function and immediately invoking func
     await onyx.authenticate('local', { message: 'hi' }, (ctx: any) => {
       console.log('usually for error handling');
     })(ctx, onyx); /// passing in onyx
+  } else if (method === 'GET' && filePath === '/protected') {
+    log.warning(ctx.state.onyx.session);
+    if (ctx.state.onyx.session?.user) {
+      log.info('session found, proceed to protected');
+      const { username } = ctx.state.onyx.session.user;
+      ctx.response.body = {
+        success: true,
+        isAuth: true,
+        username,
+      };
+    } else {
+      log.info('session not found, proceed to login');
+      ctx.response.body = {
+        success: true,
+        isAuth: false,
+      };
+    }
   }
 });
 

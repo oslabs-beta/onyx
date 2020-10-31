@@ -4,7 +4,7 @@ import Message from './Message.tsx';
 const Inputs: any = () => {
   const [username, setUsername] = (React as any).useState('');
   const [password, setPassword] = (React as any).useState('');
-  const [message, setMessage] = (React as any).useState(''); 
+  const [message, setMessage] = (React as any).useState('');
 
   const usernameOnChange = (e: any) => {
     setUsername(e.target.value);
@@ -31,6 +31,7 @@ const Inputs: any = () => {
       .then((data) => data.json())
       .then((data) => {
         setMessage(data.success);
+        // if data.success is true, set page to 'protected'
         setUsername('');
         setPassword('');
       })
