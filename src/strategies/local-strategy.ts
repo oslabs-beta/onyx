@@ -59,6 +59,7 @@ export default class LocalStrategy extends Strategy {
     }
 
     // no third-party info for local strat
+
     function verified(err: any, user: any) {
       if (err) {
         console.log('err in verified with err', err);

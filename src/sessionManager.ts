@@ -28,6 +28,8 @@ export default class SessionManager {
     // this is from passing onyx in as arg2 on server 165
     console.log(onyx.funcs.serializer);
 
+    // onyx.funcs.serializer === async func passed in onyx.serializeUser
+    // basically the done function that we see in the serialize & deserialize
     onyx.funcs.serializer(user, async (err: any, id: any) => {
       if (err) {
         return cb(err);
@@ -38,6 +40,7 @@ export default class SessionManager {
       console.log('what is id?', id);
 
       // what's the point of saving it to this when we're just going to redirect user?
+      context.state.onyx.session.user = user; // not-sure
       context.state.onyx.session.userID = id;
 
       // starting session
@@ -54,12 +57,14 @@ export default class SessionManager {
   };
 
   // developer has to invoke this using context.state.onyx._sm.logOut()
+  // if we can add to context.logOut?
   logOut = async (context: any, cb?: Function) => {
     if (context.state.onyx && context.state.onyx.session) {
       delete context.state.onyx.session.userID;
 
       const sidCookie = await context.cookies.get('sid');
 
+      // console.log('in sessionManager, sidCookie', sidCookie);
       // if using Redis Memory for Session Store
       if (context.state.session._session._store._sessionRedisStore) {
         await context.state.session._session._store._sessionRedisStore.del(
@@ -69,6 +74,9 @@ export default class SessionManager {
       // else if using Server Memory for Session Store
       else context.state.session._session._store.deleteSession(sidCookie);
 
+      // const userIDVal = await context.state.session.get('userIDKey');
+      // console.log('session for user after logout', userIDVal);
+
       // Redis Memory untested. Server Memory will actually delete the entire entry with the sidCookie key. Should we try figure out how to remove just the UserIDKey property instead?
     }
 
@@ -76,6 +84,13 @@ export default class SessionManager {
     cb && cb();
   };
 }
+
+// SessionManager.prototype.logOut = function(req, cb) {
+//   if (req._passport && req._passport.session) {
+//     delete req._passport.session.user;
+//   }
+//   cb && cb();
+// }
 
 // In this example, only the user ID is serialized to the session, keeping the amount of data stored within the session small. When subsequent requests are received, this ID is used to find the user, which will be restored to req.user.
 

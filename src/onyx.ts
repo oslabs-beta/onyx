@@ -1,5 +1,6 @@
 import SessionManager from './sessionManager.ts';
 import Strategy from './strategy.ts';
+import SessionStrategy from './strategies/session-strategy.ts';
 
 export default class Onyx {
   private _sm: any;
@@ -9,8 +10,8 @@ export default class Onyx {
   constructor() {
     // this.init()
     this._strategies = {};
-    this.init();
     this.funcs = {};
+    this.init();
   }
 
   init() {
@@ -20,6 +21,8 @@ export default class Onyx {
       /*, { key: this._key } */
       // this.funcs
     );
+
+    this.use(new SessionStrategy(this.deserializeUser.bind(this)));
   }
 
   // app.post('/login', passport.authenticate('local', {failureRedirect:'/login', successRedirect: '/dashboard'}))
@@ -74,19 +77,33 @@ export default class Onyx {
   // });
   deserializeUser(fn: Function) {
     console.log('in deserializeUser of onyx.ts');
-    this.funcs.deserializer = fn;
+    if (typeof fn === 'function') return (this.funcs.deserializer = fn);
+    else return this.funcs.deserializer;
   }
 
   // if session found in memory or redis,  adding session to ctx.state.onyx
-  // when onyx is initialize in server 60, will check session db for session
+  // when onyx is initialized in server 60, will check session db for session
   initialize(onyx: any) {
     return async (context: any, next: Function) => {
-      // context.state.onyx = new Onyx();
-      context.state.onyx = onyx;
+      context.state.onyx = new Onyx();
+      // context.state.onyx = onyx;
 
+      // attempting to addi= logIn and logOut to context
+      // context.state.onyx._sm.logOut
+      context.state.logOut = context.state.logout = this._sm.logOut;
+      context.state.logIn = context.state.login = this._sm.logIn;
+
+      console.log('logOut in ctx', context.state.logOut);
+      console.log('logIn in ctx', context.state.logIn);
+
+      //  {  SID1: {'userIDKey': userIDVal}
+      //     SID2: {}
+      //     SID3: {}
+      // }
       // if session entry exist, load data from that
       const userIDVal = await context.state.session.get('userIDKey');
 
+      // We won't enter this statement the first time we visit a website, since there isn't an existing session
       if (userIDVal) {
         if (!context.state.onyx.session) context.state.onyx.session = {};
         context.state.onyx.session.userID = userIDVal;
@@ -94,6 +111,17 @@ export default class Onyx {
           'session found! info saved in context.state.onyx.session',
           context.state.onyx.session
         );
+
+        // invoke deserializer
+        this.funcs.deserializer(userIDVal, function (err: any, user: any) {
+          if (err) throw new Error(err);
+          else if (!user) delete context.state.onyx.session.userID;
+          else {
+            if (!context.state.onyx.session) context.state.onyx.session = {};
+            context.state.onyx.session.user = user;
+            // context.request.user = user
+          }
+        });
       }
 
       await next();
