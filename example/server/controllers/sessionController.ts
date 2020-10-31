@@ -43,17 +43,4 @@ sessionController.endSession = async (ctx: any, next: any) => {
   console.log('ctx.state.session after log out', ctx.state.session);
 };
 
-// _sessionMemoryStore: {
-//   "1e9c7684-0a3b-4bb7-84c5-bf30560916d2": {'userIDKey': null},
-//   "ea759933-df0b-46e2-ad32-8e05fb8a27f4": [Object]
-// }
-// session.set is using this:
-// function set(sessionVariableKey: string, sessionVariableValue: string) : Promise<void> {
-// 	await this._session._store.setSessionVariable(this.sessionId, sessionVariableKey, sessionVariableValue);
-// }
-
-// function setSessionVariable(sessionId: any, sessionVariableKey: any, sessionVariableValue: any) : Promise<void> {
-// 	this._sessionMemoryStore[sessionId][sessionVariableKey] = sessionVariableValue;
-// }
-
 export default sessionController;

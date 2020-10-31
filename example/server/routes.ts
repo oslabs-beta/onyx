@@ -11,6 +11,17 @@ router.get('/login', (ctx) => {
   console.log('in login!');
 });
 
+router.get('/logout', async (ctx) => {
+  // console.log('whats in context?', ctx);
+  await ctx.state.logOut(ctx);
+  // ctx.logOut();
+  // ctx.logout()
+  // ctx.logIn()
+
+  console.log('in logout!');
+  ctx.response.redirect('/');
+});
+
 // router.post('/login', (ctx) => {
 //   ctx.state.onyx.authenticate('local', { message: 'hi' }, (ctx: any) => {
 //     console.log(ctx);
@@ -37,7 +48,7 @@ router.post(
   sessionController.startSession
 );
 
-router.get('/protected', sessionController.checkSession);
+// router.get('/protected', sessionController.checkSession);
 
 // this works too, more in the callback style of express
 // router.post('/login', async(ctx) {

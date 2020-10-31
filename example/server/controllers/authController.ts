@@ -1,4 +1,3 @@
-import { Context } from 'https://deno.land/x/oak@v6.3.1/context.ts';
 import User from '../models/userModels.ts';
 
 const userController: any = {};
@@ -10,7 +9,6 @@ userController.createUser = async (ctx: any, next: any) => {
   if (ctx.request.hasBody) {
     const body = await ctx.request.body();
     const { username, password } = await body.value;
-    // ctx.cookies.set('onyx', 'cookie');
     const _id = await User.insertOne({ username, password });
     console.log('id from database is', _id);
     ctx.response.body = {
@@ -36,22 +34,10 @@ userController.verifyUser = async (
   context: any,
   done: Function
 ) => {
-  // if (ctx.request.hasBody) {
-  // const body = await ctx.request.body();
-  // const { username, password } = await body.value;
-
   const { username, password } = context.state.onyx.user;
-  // console.log(context.state.o)
-  // context.response.body = {
-  //   success: false,
-  //   message: 'before db',
-  // };
 
   try {
     const user = await User.findOne({ username });
-    context.response.body = {
-      db: 'can we write here now?',
-    };
     console.log('searching for', username, password);
     console.log('after database, user is', user);
     if (user && password === user.password) {
@@ -100,22 +86,3 @@ userController.verifyUser = async (
 };
 
 export default userController;
-
-// const getProduct = ({ params, response }: { params: { id: string }, response: any }) => {
-//   //iterate through the products array and check if the current object has an id that matches the destructured id
-//   const product: Product | undefined = products.find(p => p.id === params.id)
-
-//   if (product) {
-//     response.status = 200
-//     response.body = {
-//       success: true,
-//       data: product
-//     }
-//   } else {
-//     response.status = 404
-//     response.body = {
-//       success: false,
-//       msg: 'No product found'
-//     }
-//   }
-// }
