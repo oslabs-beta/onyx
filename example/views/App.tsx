@@ -1,29 +1,30 @@
-import { React } from '../../deps.ts';
-import Inputs from './components/Inputs.tsx'
-// import './assets/style.css'
+import { React } from '../deps.ts';
+import MainContainer from './components/MainContainer.tsx';
+import NavBar from './components/NavBar.tsx';
 
-// Typescript demands that we define the typing for each JSX element, 
-// so this global interface defines the 'any' typing for whatever elements we may need
 declare global {
-    namespace JSX {
-      interface IntrinsicElements {
-        button: any;
-        input: any;
-        div: any;
-        h1: any;
-        p: any;
-      }
+  namespace JSX {
+    interface IntrinsicElements {
+      button: any;
+      img: any;
+      input: any;
+      div: any;
+      h1: any;
+      h3: any;
+      p: any;
     }
   }
+}
 
 const App = () => {
-   return (
-     <>
-      <h1>Wanna sign up??</h1>
-      <p></p>
-      <Inputs />
-     </>
-   ) 
-}
+  const [page, setPage] = (React as any).useState('home');
+
+  return (
+    <div className="app">
+      <NavBar setPage={setPage} />
+      <MainContainer page={page} />
+    </div>
+  );
+};
 
 export default App;

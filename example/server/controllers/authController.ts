@@ -9,9 +9,8 @@ userController.createUser = async (ctx: any, next: any) => {
   if(ctx.request.hasBody) {
     const body = await ctx.request.body();
     const { username, password } = await body.value;
-    // ctx.cookies.set('onyx', 'cookie');
-    const _id = await User.insertOne({username, password})
-    console.log('id from database is', _id)
+    const _id = await User.insertOne({ username, password });
+    console.log('id from database is', _id);
     ctx.response.body = {
       id: `id is ${_id}`,
       message: `username is ${username}, password is ${password}`,
@@ -28,60 +27,62 @@ userController.createUser = async (ctx: any, next: any) => {
   // }
 };
 
-userController.verifyUser = async (ctx: any, next: any) => {
-  if (ctx.request.hasBody) {
-    const body = await ctx.request.body();
-    const { username, password } = await body.value;
+// userController.verifyUser = async (ctx: any, next: any) => {
+userController.verifyUser = async (
+  // username: string,
+  // password: string,
+  context: any,
+  done: Function
+) => {
+  const { username, password } = context.state.onyx.user;
+
+  try {
     const user = await User.findOne({ username });
+    console.log('searching for', username, password);
+    console.log('after database, user is', user);
     if (user && password === user.password) {
-      // password match - success && user exists
-      const id = user._id.$oid;
-      ctx.response.body = {
-        success: true,
-        message: 'Successfully logged in!',
-        id,
-      };
-      await next();
-    } else if (user) {
-      // password mismatch - failure
-      ctx.response.body = {
-        success: false,
-        message: 'Password incorrect, dummy!',
-      }
+      console.log('password matched');
+      return done(null, user);
     } else {
-      ctx.response.body = {
-        // username mismatch - failure
-        success: false,
-        message: 'no such user found',
-      }
+      console.log('in else');
+      return done(null);
     }
-    console.log(user);
-  } else {
-    // user didn't input anything
-    ctx.response.body = {
-      success: false,
-      message: 'did you send anything in the body?'
-    }
+  } catch (error) {
+    console.log('catch error of db');
+    return done(error);
   }
-}
+  //   if (user && password === user.password) {
+  //     // start session here
+  //     // if (await req)
+
+  //     // password match - success && user exists
+  //     const id = user._id.$oid;
+  //     ctx.response.body = {
+  //       success: true,
+  //       message: 'Successfully logged in!',
+  //       id,
+  //     };
+  //     await next();
+  //   } else if (user) {
+  //     // password mismatch - failure
+  //     ctx.response.body = {
+  //       success: false,
+  //       message: 'Password incorrect, dummy!',
+  //     };
+  //   } else {
+  //     ctx.response.body = {
+  //       // username mismatch - failure
+  //       success: false,
+  //       message: 'no such user found',
+  //     };
+  //   }
+  // } else {
+  //   // user didn't input anything
+  //   ctx.response.body = {
+  //     success: false,
+  //     message: 'did you send anything in the body?',
+  //   };
+  // }
+};
 
 export default userController;
-
-// const getProduct = ({ params, response }: { params: { id: string }, response: any }) => {
-//   //iterate through the products array and check if the current object has an id that matches the destructured id
-//   const product: Product | undefined = products.find(p => p.id === params.id)
-
-//   if (product) {
-//     response.status = 200
-//     response.body = {
-//       success: true,
-//       data: product
-//     }
-//   } else {
-//     response.status = 404
-//     response.body = {
-//       success: false,
-//       msg: 'No product found'
-//     }
-//   }
-// }

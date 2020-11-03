@@ -1,4 +1,4 @@
-import { Router } from '../../deps.ts';
+import { Router } from '../deps.ts';
 import App from '../views/App.tsx';
 import userController from './controllers/authController.ts';
 import sessionController from './controllers/sessionController.ts';
@@ -11,11 +11,36 @@ router.get('/login', (ctx) => {
   console.log('in login!');
 });
 
-router.post(
-  '/login',
-  userController.verifyUser,
-  sessionController.startSession
-);
+router.get('/logout', async (ctx) => {
+  // console.log('whats in context?', ctx);
+  await ctx.state.logOut(ctx);
+  // ctx.logOut();
+  // ctx.logout()
+  // ctx.logIn()
+
+  console.log('in logout!');
+  ctx.response.redirect('/');
+});
+
+// router.post('/login', (ctx) => {
+//   ctx.state.onyx.authenticate('local', { message: 'hi' }, (ctx: any) => {
+//     console.log(ctx);
+//   });
+// });
+
+//   userController.verifyUser,
+//   sessionController.startSession
+// );
+
+// passport.use(new LocalStrategy(
+// (username, password, done) => {
+//    if(username === 'test@gmail.com' && password === '1234') {
+//        return done(null, {username: 'test@gmail.com'});
+//    } else {
+//        return done(null, false);
+//    }
+// }
+// ));
 
 router.post(
   '/register',
@@ -23,7 +48,7 @@ router.post(
   sessionController.startSession
 );
 
-router.get('/protected', sessionController.checkSession);
+// router.get('/protected', sessionController.checkSession);
 
 // this works too, more in the callback style of express
 // router.post('/login', async(ctx) {
