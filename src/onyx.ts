@@ -22,7 +22,7 @@ export default class Onyx {
       // this.funcs
     );
 
-    this.use(new SessionStrategy(this.deserializeUser.bind(this)));
+    this.use(new SessionStrategy(this.deserializeUser.bind(this))); // not being used
   }
 
   // app.post('/login', passport.authenticate('local', {failureRedirect:'/login', successRedirect: '/dashboard'}))
@@ -49,6 +49,8 @@ export default class Onyx {
         'You must provide an authentication strategy as an argment.'
       );
     }
+
+    // IMPORTANT the callback function being passed in seems to be for error handling, maybe we should just invoke it instead of throwing errors
 
     const currStrat = this._strategies[strategy];
     if (!currStrat) {
@@ -85,6 +87,8 @@ export default class Onyx {
   // when onyx is initialized in server 60, will check session db for session
   initialize(onyx: any) {
     return async (context: any, next: Function) => {
+      // each request should have it's own instance of Onyx
+      // however we were not able to save the serializer and deserializer functions to each instance and had to pass in the server's onyx when calling for the authenticate function
       context.state.onyx = new Onyx();
       // context.state.onyx = onyx;
 
@@ -112,8 +116,12 @@ export default class Onyx {
           context.state.onyx.session
         );
 
-        // invoke deserializer
-        this.funcs.deserializer(userIDVal, function (err: any, user: any) {
+        // invoke deserializer using AWAIT so that it will wait for deserializer process to complete before sending response back to client
+        await this.funcs.deserializer(userIDVal, function (
+          err: any,
+          user: any
+        ) {
+          console.log('deserializer found user?', user);
           if (err) throw new Error(err);
           else if (!user) delete context.state.onyx.session.userID;
           else {
@@ -123,7 +131,7 @@ export default class Onyx {
           }
         });
       }
-
+      console.log('finishing deserialization in onyx');
       await next();
     };
   }
