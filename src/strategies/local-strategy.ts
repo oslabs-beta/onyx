@@ -34,7 +34,7 @@ export default class LocalStrategy extends Strategy {
   }
 
   // options here are { successRedirect: '/', failureRedirect: '/login', session: true } and others
-  authenticate = async (context: any, onyx?: any, options?: any) => {
+  authenticate = async (context: any, onyx: any, options?: any) => {
     const body = await context.request.body().value;
 
     options = options || {};
@@ -94,6 +94,7 @@ export default class LocalStrategy extends Strategy {
       }
 
       // ref: passport/lib/middleware/authenticate.js
+      // can we use context.logIn() here?
       context.state.onyx._sm.logIn(
         context,
         user,
@@ -112,6 +113,8 @@ export default class LocalStrategy extends Strategy {
             console.log('without successRedirect');
             context.response.status = 200;
           }
+
+          // IMPORTANT should we await next?
         }
       );
     }

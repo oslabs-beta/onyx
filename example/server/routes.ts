@@ -1,5 +1,4 @@
 import { Router } from '../deps.ts';
-import App from '../views/App.tsx';
 import userController from './controllers/authController.ts';
 import sessionController from './controllers/sessionController.ts';
 // import users from './models/userModels.ts'
@@ -14,18 +13,36 @@ router.get('/login', (ctx) => {
 router.get('/logout', async (ctx) => {
   // console.log('whats in context?', ctx);
   await ctx.state.logOut(ctx);
-  // ctx.logOut();
-  // ctx.logout()
-  // ctx.logIn()
-
+  // ctx.response.redirect('/');
   console.log('in logout!');
-  ctx.response.redirect('/');
+  ctx.response.body = {
+    success: true,
+  };
 });
 
-// router.post('/login', (ctx) => {
-//   ctx.state.onyx.authenticate('local', { message: 'hi' }, (ctx: any) => {
-//     console.log(ctx);
-//   });
+// router.post('/login', async (ctx) => {
+//   // onyx.authenticate returns function and immediately invoking func
+//   await onyx.authenticate('local', { message: 'hi' }, (ctx: any) => {
+//     console.log('usually for error handling');
+//   })(ctx, onyx); /// passing in onyx
+
+//   // check the result of authentication here and create the ctx.response body
+
+//   if (!ctx.state.onyx.errorMessage) {
+//     console.log('in good login response', ctx.state.onyx.errorMessage);
+//     const user = ctx.state.onyx.user;
+//     console.log(ctx.response.body);
+//     ctx.response.body = {
+//       success: true,
+//       message: user,
+//     };
+//   } else {
+//     const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
+//     ctx.response.body = {
+//       success: false,
+//       message,
+//     };
+//   }
 // });
 
 //   userController.verifyUser,

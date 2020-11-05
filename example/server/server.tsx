@@ -11,7 +11,7 @@ import { React, ReactDOMServer } from '../deps.ts';
 import App from '../views/App.tsx';
 import Inputs from '../views/components/Inputs.tsx';
 import Message from '../views/components/Message.tsx';
-import Main from '../views/components/Main.tsx';
+import Home from '../views/components/Home.tsx';
 import MainContainer from '../views/components/MainContainer.tsx';
 import NavBar from '../views/components/NavBar.tsx';
 import Protected from '../views/components/Protected.tsx';
@@ -19,6 +19,7 @@ import Protected from '../views/components/Protected.tsx';
 // Onyx Middlewares
 import LocalStrategy from '../../src/strategies/local-strategy.ts';
 import Onyx from '../../src/onyx.ts';
+import { LogLevelNames } from 'https://deno.land/std@0.74.0/log/levels.ts';
 
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
@@ -62,10 +63,11 @@ onyx.deserializeUser(async function (id: string, cb: Function) {
       // cb(user);
       throw new Error('not in db');
     } else {
-      cb(null, user);
+      console.log('in deserialization, with found user', user);
+      await cb(null, user);
     }
   } catch (error) {
-    cb(error);
+    await cb(error);
   }
 });
 
@@ -110,30 +112,23 @@ app.use(async (ctx, next) => {
 });
 
 // adding user obj to response body?
-app.use(async (ctx, next) => {
-  await next();
-  if (ctx.request.method === 'POST' && ctx.request.url.pathname === '/login') {
-    if (!ctx.state.onyx.errorMessage) {
-      console.log('in good login response', ctx.state.onyx.errorMessage);
-      const user = ctx.state.onyx.user;
-      console.log(ctx.response.body);
-      ctx.response.body = {
-        success: true,
-        message: user,
-      };
-    } else {
-      const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
-      ctx.response.body = {
-        success: false,
-        message,
-      };
-    }
-  }
-});
+// app.use(async (ctx, next) => {
+//   await next();
+
+// });
 
 // router
+app.use(async (ctx, next) => {
+  log.info('line 121 before');
+  await next();
+  log.info('line 124 after');
+});
 app.use(router.routes());
 app.use(router.allowedMethods());
+app.use(async (ctx, next) => {
+  log.info('line 129');
+  await next();
+});
 
 const browserBundlePath: string = '/browser.js';
 
@@ -147,7 +142,7 @@ const js: string = `import React from "https://dev.jspm.io/react@16.14.0";
   \nconst Message = ${Message};
   \nconst Inputs = ${Inputs};
   \nconst Protected = ${Protected};
-  \nconst Main = ${Main};
+  \nconst Home = ${Home};
   \nconst NavBar = ${NavBar};
   \nconst MainContainer = ${MainContainer};
   \nReactDOM.hydrate(React.createElement(${App}), document.getElementById("root"));`;
@@ -176,6 +171,24 @@ app.use(async (ctx) => {
     await onyx.authenticate('local', { message: 'hi' }, (ctx: any) => {
       console.log('usually for error handling');
     })(ctx, onyx); /// passing in onyx
+
+    // check the result of authentication here and create the ctx.response body
+
+    if (!ctx.state.onyx.errorMessage) {
+      console.log('in good login response', ctx.state.onyx.errorMessage);
+      const user = ctx.state.onyx.user;
+      console.log(ctx.response.body);
+      ctx.response.body = {
+        success: true,
+        message: user,
+      };
+    } else {
+      const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
+      ctx.response.body = {
+        success: false,
+        message,
+      };
+    }
   } else if (method === 'GET' && filePath === '/protected') {
     log.warning(ctx.state.onyx.session);
     if (ctx.state.onyx.session?.user) {
