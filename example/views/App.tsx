@@ -22,7 +22,7 @@ const App = () => {
   return (
     <div className="app">
       <NavBar setPage={setPage} />
-      <MainContainer page={page} />
+      <MainContainer page={page} setPage={setPage} />
     </div>
   );
 };

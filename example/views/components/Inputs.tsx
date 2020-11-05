@@ -1,7 +1,8 @@
 import { React } from '../../deps.ts';
 import Message from './Message.tsx';
 
-const Inputs: any = () => {
+const Inputs: any = (props: any) => {
+  const { setPage } = props;
   const [username, setUsername] = (React as any).useState('');
   const [password, setPassword] = (React as any).useState('');
   const [message, setMessage] = (React as any).useState('');
@@ -30,10 +31,11 @@ const Inputs: any = () => {
     })
       .then((data) => data.json())
       .then((data) => {
-        setMessage(data.success);
-        // if data.success is true, set page to 'protected'
+        setMessage(data.success); // true or false
         setUsername('');
         setPassword('');
+        // if data.success is true, set page to 'protected'
+        if (data.success) setPage('protected');
       })
       .catch((e) => {
         console.log(e);

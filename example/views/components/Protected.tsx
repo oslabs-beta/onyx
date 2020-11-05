@@ -1,6 +1,7 @@
 import { React } from '../../deps.ts';
 
-const Protected: any = () => {
+const Protected: any = (props: any) => {
+  const { setPage } = props;
   const logout = () => {
     console.log('logout');
     fetch('/logout', {
@@ -11,10 +12,13 @@ const Protected: any = () => {
     })
       .then((data) => data.json())
       .then((data) => {
-        if (!data.isAuth) {
-          // direct to '/'
+        if (data.success) {
+          setPage('entry');
+        } else {
+          // something on backend not set up successfully
         }
-      });
+      })
+      .catch((err) => console.log(JSON.stringify(err)));
   };
   return (
     <div className="protected">
