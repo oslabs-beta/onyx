@@ -49,9 +49,6 @@ export default class SessionManager {
       const userIDVal = await context.state.session.get('userIDKey');
       console.log('session set for user', userIDVal);
 
-      // testing purpose only, logOut
-      // await this.logOut(context);
-
       cb();
     });
   };
@@ -84,60 +81,3 @@ export default class SessionManager {
     cb && cb();
   };
 }
-
-// SessionManager.prototype.logOut = function(req, cb) {
-//   if (req._passport && req._passport.session) {
-//     delete req._passport.session.user;
-//   }
-//   cb && cb();
-// }
-
-// In this example, only the user ID is serialized to the session, keeping the amount of data stored within the session small. When subsequent requests are received, this ID is used to find the user, which will be restored to req.user.
-
-// passport.serializeUser(function (user, done) {
-//   done(null, user.id);
-// });
-
-// passport.deserializeUser(function (id, done) {
-//   User.findById(id, function (err, user) {
-//     done(err, user);
-//   });
-// });
-
-// function SessionManager(options, serializeUser) {
-//     if (typeof options == 'function') {
-//       serializeUser = options;
-//       options = undefined;
-//     }
-//     options = options || {};
-
-//     this._key = options.key || 'passport';
-//     this._serializeUser = serializeUser;
-//   }
-
-//   SessionManager.prototype.logIn = function(req, user, cb) {
-//     var self = this;
-//     this._serializeUser(user, req, function(err, obj) {
-//       if (err) {
-//         return cb(err);
-//       }
-//       if (!req._passport.session) {
-//         req._passport.session = {};
-//       }
-//       req._passport.session.user = obj;
-//       if (!req.session) {
-//         req.session = {};
-//       }
-//       req.session[self._key] = req._passport.session;
-//       cb();
-//     });
-//   }
-
-//   SessionManager.prototype.logOut = function(req, cb) {
-//     if (req._passport && req._passport.session) {
-//       delete req._passport.session.user;
-//     }
-//     cb && cb();  // ???????????
-//   }
-
-//   module.exports = SessionManager;
