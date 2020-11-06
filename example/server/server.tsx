@@ -19,21 +19,21 @@ import Protected from '../views/components/Protected.tsx';
 // Onyx Middlewares
 import LocalStrategy from '../../src/strategies/local-strategy.ts';
 import Onyx from '../../src/onyx.ts';
-import { LogLevelNames } from 'https://deno.land/std@0.74.0/log/levels.ts';
+import { reset } from 'https://deno.land/std@0.74.0/fmt/colors.ts';
 
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
 
 // session for Server Memory
-const session = new Session({ framework: 'oak' });
+// const session = new Session({ framework: 'oak' });
 
-// // session from Redis Memory
-// const session = new Session({
-//   framework: 'oak',
-//   store: 'redis',
-//   hostname: '127.0.0.1',
-//   port: 6379,
-// });
+// session from Redis Memory
+const session = new Session({
+  framework: 'oak',
+  store: 'redis',
+  hostname: '127.0.0.1',
+  port: 6379,
+});
 
 // Initialize Session
 await session.init();
@@ -41,13 +41,19 @@ await session.init();
 const onyx = new Onyx();
 
 // saving the LocalStrategy onto onyx._strategies['local'] to be invoked in onyx.authenticate('local')
-onyx.use(new LocalStrategy(userController.verifyUser));
+onyx.use(
+  new LocalStrategy(userController.verifyUser, {
+    usernameField: 'username',
+    passwordField: 'password',
+  })
+);
 // onyx.use(other strategies)
 
 // developer will provide the serializer and deserializer functions that will specify the user id property to save in session db and the _id to query the user db for
 onyx.serializeUser(async function (user: any, cb: Function) {
   // developer will specify the user id in the user object  //user  //user.id
-  cb(null, user._id.$oid);
+  // CHANGE - 6th await
+  await cb(null, user._id.$oid);
 });
 
 onyx.deserializeUser(async function (id: string, cb: Function) {
@@ -95,7 +101,7 @@ app.use(session.use()(session));
 // session code has bug where it's not taking the 2nd argument as cookie config options
 
 // onyx.initialize(onyx) returnes a async function
-app.use(onyx.initialize(onyx));
+app.use(onyx.initialize()); // 11.5 removed the onyx that's passed in
 
 // Track response time in headers of responses
 app.use(async (ctx, next) => {
@@ -147,7 +153,7 @@ const js: string = `import React from "https://dev.jspm.io/react@16.14.0";
   \nconst MainContainer = ${MainContainer};
   \nReactDOM.hydrate(React.createElement(${App}), document.getElementById("root"));`;
 
-app.use(async (ctx) => {
+app.use(async (ctx, next) => {
   const filePath = ctx.request.url.pathname;
   const method = ctx.request.method;
 
@@ -168,12 +174,37 @@ app.use(async (ctx) => {
     });
   } else if (method === 'POST' && filePath === '/login') {
     // onyx.authenticate returns function and immediately invoking func
-    await onyx.authenticate('local', { message: 'hi' }, (ctx: any) => {
-      console.log('usually for error handling');
-    })(ctx, onyx); /// passing in onyx
+    // const auth = await onyx.authenticate(
+    //   'local',
+    //   { message: 'hi' },
+    //   (ctx: any) => {
+    //     console.log('usually for error handling');
+    //   }
+    // ) ; /// passing in onyx;
+    // console.log('auth is', auth);
+    // await auth(ctx);
+    await (
+      await onyx.authenticate(
+        'local'
+        // { successRedirect: '/', failureRedirect: '/login' }
+        // (err: any, user: any) => {
+        //   if (!user) {
+        //     return ctx.response.redirect('/login');
+        //   }
+        //   ctx.response.body = {
+        //     success: true,
+        //     user: user,
+        //     message: 'weird callback function',
+        //   };
+        // }
+      )
+    )(ctx);
+
+    console.log('after onyx.authenticate() in server');
+
+    // router.post('/login', onyx.authenticate('local'), nextMiddleware)
 
     // check the result of authentication here and create the ctx.response body
-
     if (!ctx.state.onyx.errorMessage) {
       console.log('in good login response', ctx.state.onyx.errorMessage);
       const user = ctx.state.onyx.user;
@@ -206,7 +237,7 @@ app.use(async (ctx) => {
         isAuth: false,
       };
     }
-  }
+  } else await next();
 });
 
 // Error handler missing path?
