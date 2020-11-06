@@ -25,15 +25,15 @@ const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
 
 // session for Server Memory
-// const session = new Session({ framework: 'oak' });
+const session = new Session({ framework: 'oak' });
 
 // session from Redis Memory
-const session = new Session({
-  framework: 'oak',
-  store: 'redis',
-  hostname: '127.0.0.1',
-  port: 6379,
-});
+// const session = new Session({
+//   framework: 'oak',
+//   store: 'redis',
+//   hostname: '127.0.0.1',
+//   port: 6379,
+// });
 
 // Initialize Session
 await session.init();
