@@ -1,15 +1,12 @@
 //  in passport authenticator: new SessionManager({ key: this._key }, this.serializeUser.bind(this))
 
 export default class SessionManager {
-  private _key: string;
   private _serializeUser: Function;
-  // private _funcs: any;
 
-  constructor(serializeUser: Function, options?: any) {
-    // constructor(funcs: object, options?: any) {
-    this._key = 'sid';
+  // constructor(serializeUser: Function, options?: any) in passport.js but not sure
+  // if need options?
+  constructor(serializeUser: Function) {
     this._serializeUser = serializeUser;
-    // this._funcs = funcs;
   }
 
   // onyx.authenticate() will invoke this on /login path, but on /register path developer will have to invoke this function using context.state.onyx._sm.logIn ---- would be better if we can add to context.logIn or something similar
@@ -21,36 +18,43 @@ export default class SessionManager {
 
     // in onyx initialize, fixed so that context.state.onyx is the onyx object created in the server and not a new instance of Onyx.  so now calling for the serializeUser function will be in the instance of onyx that has the funcs property with the serializer and deserializer
     const serializer = await this._serializeUser();
-    console.log(serializer);
-
-    // console.log('funcs are', this._funcs);  // funcs are undefine
-
-    // this is from passing onyx in as arg2 on server 165
-    console.log(onyx.funcs.serializer);
+    console.log('what is this._serializer in sessionManager', serializer);
 
     // onyx.funcs.serializer === async func passed in onyx.serializeUser
     // basically the done function that we see in the serialize & deserialize
-    onyx.funcs.serializer(user, async (err: any, id: any) => {
+    // CHANGE - #7th await
+    await onyx.funcs.serializer(user, async (err: any, id: any) => {
       if (err) {
         return cb(err);
       }
       if (!context.state.onyx.session) {
         context.state.onyx.session = {};
       }
-      console.log('what is id?', id);
 
-      // what's the point of saving it to this when we're just going to redirect user?
-      context.state.onyx.session.user = user; // not-sure
+      // saving for developer to use if they want (if no redirect options were provided)
+      context.state.onyx.session.user = user; // can we add this to somewhere more accessable?  // REFRACTOR
       context.state.onyx.session.userID = id;
 
+      /// TESTING  --- context.state.user persists between different users
+      // console.log('user before', context.state.user);
+      // context.state.user = user;
+      // console.log('user after', context.state.user);
+
       // starting session
-      context.state.session.set('userIDKey', id);
+      // CHANGE # 3 - TESTED - works without await b/c when deserialize,
+      // have active session but think better to await to confirm session is active
+      // process of setting an active session has been started, it'll complete whether or not you wait for it
+      await context.state.session.set('userIDKey', id);
 
       const userIDVal = await context.state.session.get('userIDKey');
-      console.log('session set for user', userIDVal);
+      console.log('session set for user in sessionManager', userIDVal);
 
-      cb();
+      // REFACTOR next-middleware
+      cb(); // CHANGE # 1 - TESTED - still works without await b/c last middleware?
+      console.log('after the await cb of sessionManager');
     });
+
+    //
   };
 
   // developer has to invoke this using context.state.onyx._sm.logOut()

@@ -6,8 +6,11 @@ import sessionController from './controllers/sessionController.ts';
 const router = new Router();
 
 router.get('/login', (ctx) => {
-  ctx.response.body = 'do a post request';
-  console.log('in login!');
+  ctx.response.body = {
+    success: false,
+    message: 'temporary failure redirect',
+  };
+  console.log('in route.get login');
 });
 
 router.get('/logout', async (ctx) => {
