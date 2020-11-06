@@ -2,13 +2,8 @@
 // export { join, dirname } from 'https://deno.land/std@0.74.0/path/mod.ts';
 // export * as log from 'https://deno.land/std@0.74.0/log/mod.ts';
 
-<<<<<<< HEAD
-// for creating sid
-export { v4 } from 'https://deno.land/std/uuid/mod.ts'; //likely can remove since session module doing this for us / it imports it anyways
-=======
 // // for creating sid
 // export { v4 } from 'https://deno.land/std/uuid/mod.ts';
->>>>>>> f11ccafbaab1e342c9105f748ad8a9c6d08742ac
 
 // // Third Party Dependencies
 
