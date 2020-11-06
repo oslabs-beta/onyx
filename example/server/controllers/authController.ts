@@ -38,18 +38,21 @@ userController.verifyUser = async (
 
   try {
     const user = await User.findOne({ username });
-    console.log('searching for', username, password);
+    console.log('searching for', username, password, 'in verifyUser');
     console.log('after database, user is', user);
     if (user && password === user.password) {
       console.log('password matched');
-      return done(null, user);
+      // CHANGE - 5TH await --- TESTED - it's necessary
+      await done(null, user);
+
+      // return done(null, user);
     } else {
       console.log('in else');
-      return done(null);
+      await done(null);
     }
   } catch (error) {
     console.log('catch error of db');
-    return done(error);
+    await done(error);
   }
   //   if (user && password === user.password) {
   //     // start session here
