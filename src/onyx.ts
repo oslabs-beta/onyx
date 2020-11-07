@@ -67,13 +67,12 @@ export default class Onyx {
     console.log('in serializeUser of onyx, this.funcs is', this.funcs);
     if (typeof fn === 'function') {
       console.log('in serializeUser of onyx.ts');
-      return (this.funcs.serializer = fn);
+      // return (this.funcs.serializer = fn);
+      this.funcs.serializer = fn;
+      return;
     } else return this.funcs.serializer;
   }
 
-  // onyx.deserializeUser((username, done) => {
-  //   done(null, {username: username});
-  // });
   deserializeUser(fn: Function) {
     console.log('in deserializeUser of onyx.ts');
     if (typeof fn === 'function') return (this.funcs.deserializer = fn);
