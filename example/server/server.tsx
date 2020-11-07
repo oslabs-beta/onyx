@@ -1,5 +1,6 @@
 import { Application, send, join, log } from '../deps.ts';
 import { Session } from '../deps.ts';
+// import onyx from '../../mod.ts';
 
 // Server Middlewares
 import router from './routes.ts';
@@ -18,8 +19,10 @@ import Protected from '../views/components/Protected.tsx';
 
 // Onyx Middlewares
 import LocalStrategy from '../../src/strategies/local-strategy.ts';
-import Onyx from '../../src/onyx.ts';
-import { reset } from 'https://deno.land/std@0.74.0/fmt/colors.ts';
+// import Onyx from '../../src/onyx.ts'; // switching-to-mod
+import onyx from '../../mod.ts'; // pushed up top
+import onyxSetup from './onyx-setup.ts';
+onyxSetup();
 
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
@@ -38,44 +41,44 @@ const session = new Session({
 // Initialize Session
 await session.init();
 
-const onyx = new Onyx();
+// const onyx = new Onyx();  // switching-to-mod
 
 // saving the LocalStrategy onto onyx._strategies['local'] to be invoked in onyx.authenticate('local')
-onyx.use(
-  new LocalStrategy(userController.verifyUser, {
-    usernameField: 'username',
-    passwordField: 'password',
-  })
-);
+// onyx.use(
+//   new LocalStrategy(userController.verifyUser, {
+//     usernameField: 'username',
+//     passwordField: 'password',
+//   })
+// );
 // onyx.use(other strategies)
 
 // developer will provide the serializer and deserializer functions that will specify the user id property to save in session db and the _id to query the user db for
-onyx.serializeUser(async function (user: any, cb: Function) {
-  // developer will specify the user id in the user object  //user  //user.id
-  // CHANGE - 6th await
-  await cb(null, user._id.$oid);
-});
+// onyx.serializeUser(async function (user: any, cb: Function) {
+//   // developer will specify the user id in the user object  //user  //user.id
+//   // CHANGE - 6th await
+//   await cb(null, user._id.$oid);
+// });
 
-onyx.deserializeUser(async function (id: string, cb: Function) {
-  console.log('deserializing');
+// onyx.deserializeUser(async function (id: string, cb: Function) {
+//   console.log('deserializing');
 
-  // we'll use the id (from session or onyx?) and go inside the mongoDB to find the user object
+//   // we'll use the id (from session or onyx?) and go inside the mongoDB to find the user object
 
-  const _id = { $oid: id };
+//   const _id = { $oid: id };
 
-  try {
-    const user = await User.findOne({ _id });
-    if (!user) {
-      // cb(user);
-      throw new Error('not in db');
-    } else {
-      console.log('in deserialization, with found user', user);
-      await cb(null, user);
-    }
-  } catch (error) {
-    await cb(error);
-  }
-});
+//   try {
+//     const user = await User.findOne({ _id });
+//     if (!user) {
+//       // cb(user);
+//       throw new Error('not in db');
+//     } else {
+//       console.log('in deserialization, with found user', user);
+//       await cb(null, user);
+//     }
+//   } catch (error) {
+//     await cb(error);
+//   }
+// });
 
 // Error Notification
 app.addEventListener('error', (event) => {
@@ -125,14 +128,15 @@ app.use(async (ctx, next) => {
 
 // router
 app.use(async (ctx, next) => {
-  log.info('line 121 before');
+  log.info('incoming request line 131');
   await next();
-  log.info('line 124 after');
+  log.info('returning response line 133');
 });
+
 app.use(router.routes());
 app.use(router.allowedMethods());
 app.use(async (ctx, next) => {
-  log.info('line 129');
+  log.info('incoming request line 139');
   await next();
 });
 
@@ -172,54 +176,55 @@ app.use(async (ctx, next) => {
     await send(ctx, filePath, {
       root: join(Deno.cwd(), 'example/views/assets'),
     });
-  } else if (method === 'POST' && filePath === '/login') {
-    // onyx.authenticate returns function and immediately invoking func
-    // const auth = await onyx.authenticate(
-    //   'local',
-    //   { message: 'hi' },
-    //   (ctx: any) => {
-    //     console.log('usually for error handling');
+    // } else if (method === 'POST' && filePath === '/login') {
+    //   console.log('line 178)', onyx);
+    //   // onyx.authenticate returns function and immediately invoking func
+    //   // const auth = await onyx.authenticate(
+    //   //   'local',
+    //   //   { message: 'hi' },
+    //   //   (ctx: any) => {
+    //   //     console.log('usually for error handling');
+    //   //   }
+    //   // ) ; /// passing in onyx;
+    //   // console.log('auth is', auth);
+    //   // await auth(ctx);
+    //   await (
+    //     await onyx.authenticate(
+    //       'local'
+    //       // { successRedirect: '/', failureRedirect: '/login' }
+    //       // (err: any, user: any) => {
+    //       //   if (!user) {
+    //       //     return ctx.response.redirect('/login');
+    //       //   }
+    //       //   ctx.response.body = {
+    //       //     success: true,
+    //       //     user: user,
+    //       //     message: 'weird callback function',
+    //       //   };
+    //       // }
+    //     )
+    //   )(ctx);
+
+    //   console.log('after onyx.authenticate() in server');
+
+    //   // router.post('/login', onyx.authenticate('local'), nextMiddleware)
+
+    //   // check the result of authentication here and create the ctx.response body
+    //   if (!ctx.state.onyx.errorMessage) {
+    //     console.log('in good login response', ctx.state.onyx.errorMessage);
+    //     const user = ctx.state.onyx.user;
+    //     console.log(ctx.response.body);
+    //     ctx.response.body = {
+    //       success: true,
+    //       message: user,
+    //     };
+    //   } else {
+    //     const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
+    //     ctx.response.body = {
+    //       success: false,
+    //       message,
+    //     };
     //   }
-    // ) ; /// passing in onyx;
-    // console.log('auth is', auth);
-    // await auth(ctx);
-    await (
-      await onyx.authenticate(
-        'local'
-        // { successRedirect: '/', failureRedirect: '/login' }
-        // (err: any, user: any) => {
-        //   if (!user) {
-        //     return ctx.response.redirect('/login');
-        //   }
-        //   ctx.response.body = {
-        //     success: true,
-        //     user: user,
-        //     message: 'weird callback function',
-        //   };
-        // }
-      )
-    )(ctx);
-
-    console.log('after onyx.authenticate() in server');
-
-    // router.post('/login', onyx.authenticate('local'), nextMiddleware)
-
-    // check the result of authentication here and create the ctx.response body
-    if (!ctx.state.onyx.errorMessage) {
-      console.log('in good login response', ctx.state.onyx.errorMessage);
-      const user = ctx.state.onyx.user;
-      console.log(ctx.response.body);
-      ctx.response.body = {
-        success: true,
-        message: user,
-      };
-    } else {
-      const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
-      ctx.response.body = {
-        success: false,
-        message,
-      };
-    }
   } else if (method === 'GET' && filePath === '/protected') {
     log.warning(ctx.state.onyx.session);
     if (ctx.state.onyx.session?.user) {
@@ -237,15 +242,17 @@ app.use(async (ctx, next) => {
         isAuth: false,
       };
     }
-  } else await next();
+  }
+  // else await next();
 });
 
 // Error handler missing path?
-app.use(async (ctx) => {
-  // Will throw a 500 on every request.  ??????
-  log.error('finally in error handler of the end');
-  ctx.throw(500);
-});
+// coming into here will break the server
+// app.use(async (ctx) => {
+//   // Will throw a 500 on every request.  ??????
+//   log.error('finally in error handler of the end');
+//   ctx.throw(500);
+// });
 
 // import.meta.main determines if the server was opened directly (i.e. through 'deno run' or 'denon start')
 // rather than through testing
@@ -254,6 +261,6 @@ if (import.meta.main) {
   await app.listen({ port });
 }
 
-export { app };
+export { app, onyx };
 // use this command to run example server
 // deno run --allow-net --allow-read --allow-write --unstable --allow-plugin --allow-env example/server/server.tsx
