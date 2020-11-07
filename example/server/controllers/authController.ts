@@ -4,8 +4,6 @@ const userController: any = {};
 
 userController.createUser = async (ctx: any, next: any) => {
   console.log('hello! in userController.createUser');
-  // const cookies = await ctx.cookies.get('onyx');
-  // console.log('cookies?', cookies);
   if (ctx.request.hasBody) {
     const body = await ctx.request.body();
     const { username, password } = await body.value;
@@ -27,13 +25,7 @@ userController.createUser = async (ctx: any, next: any) => {
   // }
 };
 
-// userController.verifyUser = async (ctx: any, next: any) => {
-userController.verifyUser = async (
-  // username: string,
-  // password: string,
-  context: any,
-  done: Function
-) => {
+userController.verifyUser = async (context: any, done: Function) => {
   const { username, password } = context.state.onyx.user;
 
   try {
@@ -54,38 +46,6 @@ userController.verifyUser = async (
     console.log('catch error of db');
     await done(error);
   }
-  //   if (user && password === user.password) {
-  //     // start session here
-  //     // if (await req)
-
-  //     // password match - success && user exists
-  //     const id = user._id.$oid;
-  //     ctx.response.body = {
-  //       success: true,
-  //       message: 'Successfully logged in!',
-  //       id,
-  //     };
-  //     await next();
-  //   } else if (user) {
-  //     // password mismatch - failure
-  //     ctx.response.body = {
-  //       success: false,
-  //       message: 'Password incorrect, dummy!',
-  //     };
-  //   } else {
-  //     ctx.response.body = {
-  //       // username mismatch - failure
-  //       success: false,
-  //       message: 'no such user found',
-  //     };
-  //   }
-  // } else {
-  //   // user didn't input anything
-  //   ctx.response.body = {
-  //     success: false,
-  //     message: 'did you send anything in the body?',
-  //   };
-  // }
 };
 
 export default userController;
