@@ -5,9 +5,9 @@ import userController from './controllers/authController.ts';
 
 export default () => {
   console.log('onyx-setup has been invoked');
+
+  // developer will provide the serializer and deserializer functions that will specify the user id property to save in session db and the _id to query the user db for
   onyx.serializeUser(async function (user: any, cb: Function) {
-    // developer will specify the user id in the user object  //user  //user.id
-    // CHANGE - 6th await
     await cb(null, user._id.$oid);
   });
 
@@ -18,6 +18,7 @@ export default () => {
     try {
       const user = await User.findOne({ _id });
       if (!user) {
+        // 11.8 *note* throwing error will break server, maybe we should do cb(null)
         throw new Error('not in db');
       } else {
         console.log('in deserialization, with found user', user);
@@ -30,3 +31,12 @@ export default () => {
 
   onyx.use(new LocalStrategy(userController.verifyUser));
 };
+
+// saving the LocalStrategy onto onyx._strategies['local'] to be invoked in onyx.authenticate('local')
+// onyx.use(
+//   new LocalStrategy(userController.verifyUser, {
+//     usernameField: 'username',
+//     passwordField: 'password',
+//   })
+// );
+// onyx.use(other strategies)

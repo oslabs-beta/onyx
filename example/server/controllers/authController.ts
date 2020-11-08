@@ -11,7 +11,7 @@ userController.createUser = async (ctx: any, next: any) => {
     console.log('id from database is', _id);
     ctx.response.body = {
       id: `id is ${_id}`,
-      message: `username is ${username}, password is ${password}`,
+      message: `username is ${username}`,
     };
   } else {
     ctx.response.body = {
@@ -19,10 +19,6 @@ userController.createUser = async (ctx: any, next: any) => {
       message: 'need input, body is empty',
     };
   }
-  // await next();
-  // ctx.response.body = {...ctx.response.body,
-  //   message3: 'hello from createUser again'
-  // }
 };
 
 userController.verifyUser = async (context: any, done: Function) => {
@@ -39,11 +35,9 @@ userController.verifyUser = async (context: any, done: Function) => {
 
       // return done(null, user);
     } else {
-      console.log('in else');
       await done(null);
     }
   } catch (error) {
-    console.log('catch error of db');
     await done(error);
   }
 };
