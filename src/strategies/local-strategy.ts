@@ -33,8 +33,6 @@ export default class LocalStrategy extends Strategy {
     this._verify = verifyCB;
   }
 
-  // options here are { successRedirect: '/', failureRedirect: '/login', session: true } and others
-  // authenticate = async (context: any, onyx: any, options?: any) => {
   authenticate = async (onyx: any, options?: any, callback?: Function) => {
     if (typeof options === 'function') {
       callback = options;
