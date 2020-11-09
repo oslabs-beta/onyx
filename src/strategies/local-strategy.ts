@@ -32,7 +32,7 @@ export default class LocalStrategy extends Strategy {
     this.name = 'local';
     this._verify = verifyCB;
   }
-
+  // in passport, only has context and options passed in in authenticate func
   authenticate = async (onyx: any, options?: any, callback?: Function) => {
     if (typeof options === 'function') {
       callback = options;

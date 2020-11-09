@@ -23,6 +23,10 @@ export default class SessionManager {
     // onyx.funcs.serializer === async func passed in onyx.serializeUser
     // basically the done function that we see in the serialize & deserialize
     // CHANGE - #7th await
+    console.log(
+      'in SM before serializer, whats in context.state.onyx',
+      context.state.onyx
+    );
     await onyx.funcs.serializer(user, async (err: any, id: any) => {
       if (err) {
         return cb(err);

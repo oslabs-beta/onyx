@@ -5,10 +5,12 @@ import Strategy from './strategy.ts';
 export default class Onyx {
   private _sm: any;
   private _strategies: any;
+  private _userProperty: string;
   public funcs: any;
 
   constructor() {
     this._strategies = {};
+    this._userProperty = 'user';
     this.funcs = {};
     this.init();
   }
@@ -105,11 +107,13 @@ export default class Onyx {
 
   // when onyx is initialized in server (on each incoming request), will check session db for active session
   // if active session found, invoke deserialization
-  initialize() {
+  initialize(options?: { userProperty?: 'string' }) {
     return async (context: any, next: Function) => {
       // each connection should have it's own instance of Onyx
       // can only add property onto context.state which will persist while server is active, unlike the request object of express which is unique for each connection
       context.state.onyx = new Onyx();
+
+      this._userProperty = options?.userProperty || 'user';
 
       // if we want to accomodate other frameworks, the following needs to be in an 'oak.tsx' file to be imported in as the framework
 
