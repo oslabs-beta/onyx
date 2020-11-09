@@ -31,44 +31,40 @@ import userController from '../example/server/controllers/authController.ts';
 // });
 
 
-// ****** Uncomment below 
+Deno.test("Onyx constructor check", () => {
+  const onyx = new Onyx();
+//  console.log(onyx.init);
+  console.log(onyx['_sm']);
+  console.log(onyx);
+  console.log(SessionManager);
+//  let newSessionManager = new SessionManager(this.serializeUser.bind(this))
+  console.log("What's good George?");
+//  let strategiesValue = onyx._strategies;
+ // unreachable(onyx._strategies);
+ // ************to access Private -- you can utilize brackets
+  assertEquals(onyx['_strategies'], {});
+  assertEquals(onyx['funcs'], {});
+  assertEquals(onyx['_sm'].logIn.constructor.name, "AsyncFunction");
+  assertEquals(onyx['_sm'].logOut.constructor.name, "AsyncFunction");
+  // assertEquals(onyx['_strategies'], newSessionManager);
+})
 
-// Deno.test("Onyx constructor check", () => {
-//   const onyx = new Onyx();
-// //  console.log(onyx.init);
-//   console.log(onyx['_sm']);
-//   console.log(onyx);
-//   console.log(SessionManager);
-// //  let newSessionManager = new SessionManager(this.serializeUser.bind(this))
-//   console.log("What's good George?");
-// //  let strategiesValue = onyx._strategies;
-//  // unreachable(onyx._strategies);
-//  // ************to access Private -- you can utilize brackets
-//   assertEquals(onyx['_strategies'], {});
-//   assertEquals(onyx['funcs'], {});
-//   assertEquals(onyx['_sm'].logIn.constructor.name, "AsyncFunction");
-//   assertEquals(onyx['_sm'].logOut.constructor.name, "AsyncFunction");
-//   // assertEquals(onyx['_strategies'], newSessionManager);
-// })
+// for testing purposes
+// replace below userController.verifyUser using a different custom Function
+// bring in the 
+Deno.test("*********Onyx methods check", () => {
+  const onyx = new Onyx();
+  const dummyTest = () => {
+    console.log('hi');
+  }
+  onyx.use(
+    new LocalStrategy(dummyTest, {
+      usernameField: 'username',
+      passwordField: 'password',
+    })
+  );
+  console.log(onyx);
+  assertEquals(onyx['_strategies'].local._usernameField, "username");
+    assertEquals(onyx['_strategies'].local._passwordField, "password");
 
-// // for testing purposes
-// // replace below userController.verifyUser using a different custom Function
-// // bring in the 
-// Deno.test("*********Onyx methods check", () => {
-//   const onyx = new Onyx();
-//   const dummyTest = () => {
-//     console.log('hi');
-//   }
-//   onyx.use(
-//     new LocalStrategy(dummyTest, {
-//       usernameField: 'username',
-//       passwordField: 'password',
-//     })
-//   );
-//   console.log(onyx);
-//   assertEquals(onyx['_strategies'].local._usernameField, "username");
-//   assertEquals(onyx['_strategies'].local._passwordField, "password");
-
-// })
-
-// ****** Uncomment above
+})
