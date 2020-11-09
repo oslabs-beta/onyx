@@ -154,6 +154,7 @@ const js: string = `import React from "https://dev.jspm.io/react@16.14.0";
   \nReactDOM.hydrate(React.createElement(${App}), document.getElementById("root"));`;
 
 app.use(async (ctx, next) => {
+  console.log('***************************************',ctx);
   const filePath = ctx.request.url.pathname;
   const method = ctx.request.method;
 
