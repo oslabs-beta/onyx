@@ -1,4 +1,7 @@
-import { Router } from '../deps.ts';
+import { Router, log } from '../deps.ts';
+import userController from './controllers/authController.ts';
+import sessionController from './controllers/sessionController.ts';
+// import users from './models/userModels.ts'
 import User from './models/userModels.ts';
 import onyx from '../../mod.ts';
 
@@ -116,4 +119,5 @@ router.post('/login', async (ctx, next) => {
 // router.get('/protected', sessionController.checkSession);
 
 console.log('in routes.ts');
+log.info('in routes.ts');
 export default router;

@@ -2,11 +2,11 @@ import { Application, send, join, log } from '../deps.ts';
 import { Session } from '../deps.ts';
 
 // Server Middlewares
-import router from './routes.ts';
 import onyx from '../../mod.ts';
 import onyxSetup from './onyx-setup.ts';
+import router from './routes.ts';
 await onyxSetup();
-
+log.info('hi')
 // SSR
 import { html, browserBundlePath, js } from './ssrConstants.tsx';
 
@@ -14,15 +14,15 @@ const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
 
 // session for Server Memory
-// const session = new Session({ framework: 'oak' });
+const session = new Session({ framework: 'oak' });
 
 // session from Redis Memory
-const session = new Session({
-  framework: 'oak',
-  store: 'redis',
-  hostname: '127.0.0.1',
-  port: 6379,
-});
+// const session = new Session({
+//   framework: 'oak',
+//   store: 'redis',
+//   hostname: '127.0.0.1',
+//   port: 6379,
+// });
 
 // Initialize Session
 await session.init();
@@ -49,7 +49,7 @@ app.use(async (ctx, next) => {
 app.use(async (ctx, next) => {
   await next();
   const rt = ctx.response.headers.get('X-Response-Time');
-  console.log(`${ctx.request.method} ${ctx.request.url} - ${rt}`);
+  console.log(`${ctx.request.method} ${ctx.request.url} - Response Time = ${rt}`);
 });
 
 app.use(async (ctx, next) => {
@@ -64,7 +64,7 @@ app.use(async (ctx, next) => {
 app.use(session.use()(session));
 // session code has bug where it's not taking the 2nd argument as cookie config options
 
-// onyx.initialize(onyx) returnes a async function
+// onyx.initialize(onyx) returnes a async function 
 app.use(onyx.initialize());
 
 // router
@@ -83,6 +83,7 @@ app.use(async (ctx, next) => {
 });
 
 app.use(async (ctx, next) => {
+//  console.log('***************************************',ctx);
   const filePath = ctx.request.url.pathname;
   const method = ctx.request.method;
 
@@ -102,7 +103,13 @@ app.use(async (ctx, next) => {
       root: join(Deno.cwd(), 'example/views/assets'),
     });
   } else if (method === 'GET' && filePath === '/protected') {
-    log.warning(ctx.state.onyx.session);
+    if(!ctx.state.onyx.session) {
+      log.warning('Hmm...It appears that your session is UNDEFINED');
+    } 
+    if (ctx.state.onyx.session !== undefined) {
+      log.warning(ctx.state.onyx.session);
+    }
+//    log.warning(ctx.state.onyx.session);
     if (ctx.state.onyx.session?.user) {
       log.info('session found, proceed to protected');
       const { username } = ctx.state.onyx.session.user;

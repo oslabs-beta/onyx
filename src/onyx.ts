@@ -110,7 +110,7 @@ export default class Onyx {
   initialize(options?: { userProperty?: 'string' }) {
     return async (context: any, next: Function) => {
       // each connection should have it's own instance of Onyx
-      // can only add property onto context.state which will persist while server is active, unlike the request object of express which is unique for each connection
+      // can only add property on context.state which'll persist while server is active,unlike the req obj of express which is unique for ea connection
       context.state.onyx = new Onyx();
 
       this._userProperty = options?.userProperty || 'user';
