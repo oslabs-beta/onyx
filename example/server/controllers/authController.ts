@@ -19,6 +19,7 @@ userController.createUser = async (ctx: any, next: any) => {
       message: 'need input, body is empty'
     }
   }
+  await next();
 };
 
 userController.verifyUser = async (context: any, done: Function) => {
