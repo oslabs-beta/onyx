@@ -108,7 +108,7 @@ export default class Onyx {
   initialize() {
     return async (context: any, next: Function) => {
       // each connection should have it's own instance of Onyx
-      // can only add property onto context.state which will persist while server is active, unlike the request object of express which is unique for each connection
+      // can only add property on context.state which'll persist while server is active,unlike the req obj of express which is unique for ea connection
       context.state.onyx = new Onyx();
 
       // if we want to accomodate other frameworks, the following needs to be in an 'oak.tsx' file to be imported in as the framework

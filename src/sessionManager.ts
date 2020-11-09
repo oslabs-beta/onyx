@@ -9,14 +9,16 @@ export default class SessionManager {
     this._serializeUser = serializeUser;
   }
 
-  // onyx.authenticate() will invoke this on /login path, but on /register path developer will have to invoke this function using context.state.onyx._sm.logIn ---- would be better if we can add to context.logIn or something similar
+  // onyx.authenticate() will invoke this on /login path, but on /register path developer will have to invoke this function using 
+  // context.state.onyx._sm.logIn ---- would be better if we can add to context.logIn or something similar
   logIn = async (context: any, user: any, onyx: any, cb: Function) => {
     // in server, developer will define where the id is located on the user object and pass that as 2nd arg in done
     // onyx.serializeUser(function(user, done) {
     //    done(null, user.id);
     // });
 
-    // in onyx initialize, fixed so that context.state.onyx is the onyx object created in the server and not a new instance of Onyx.  so now calling for the serializeUser function will be in the instance of onyx that has the funcs property with the serializer and deserializer
+    // in onyx initialize, fixed so that context.state.onyx is the onyx object created in the server and not a new instance of Onyx.  
+    // so now calling for the serializeUser function will be in the instance of onyx that has the funcs property with the serializer and deserializer
     const serializer = await this._serializeUser();
     console.log('what is this._serializer in sessionManager', serializer);
 
@@ -78,7 +80,8 @@ export default class SessionManager {
       // const userIDVal = await context.state.session.get('userIDKey');
       // console.log('session for user after logout', userIDVal);
 
-      // Redis Memory untested. Server Memory will actually delete the entire entry with the sidCookie key. Should we try figure out how to remove just the UserIDKey property instead?
+      // Redis Memory untested. Server Memory will actually delete the entire entry with the sidCookie key. Should we try figure out how to remove 
+      // just the UserIDKey property instead?
     }
 
     // If the callback exists? --> Invoke it

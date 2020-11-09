@@ -1,9 +1,11 @@
+import { log } from '../deps.ts';
 import onyx from '../../mod.ts';
 import LocalStrategy from '../../src/strategies/local-strategy.ts';
 import User from './models/userModels.ts';
 import userController from './controllers/authController.ts';
 
 export default () => {
+  log.info('onyx-setup has been invoked');
   console.log('onyx-setup has been invoked');
 
   // developer will provide the serializer and deserializer functions that will specify the user id property to save in session db and the _id to query the user db for
