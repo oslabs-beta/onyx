@@ -22,15 +22,21 @@ export default class Onyx {
 
   // 11.7 *options* - giving developer an option to customize their strategy name  *README*
   use(name: string | Strategy, strategy?: Strategy) {
-    if (typeof name !== 'string') {
-      strategy = name;
-      name = strategy.name;
+    try {
+      if (typeof name !== 'string') {
+        strategy = name;
+        name = strategy.name;
+      } else {
+        if (!strategy) throw new Error('Strategy needs to be provided!');
+      }
+      if (!name || typeof name !== 'string') {
+        throw new Error('Authentication strategies must have a name!');
+      }
+      this._strategies[name] = strategy;
+      return this;
+    } catch (err) {
+      return err;
     }
-    if (!name || typeof name !== 'string') {
-      throw new Error('Authentication strategies must have a name!');
-    }
-    this._strategies[name] = strategy;
-    return this;
   }
   // onyx.authenticate('local')
   // onyx.use('newLocal', new LocalStrategy())
@@ -71,9 +77,7 @@ export default class Onyx {
     callback?: Function
   ) {
     if (!strategy) {
-      throw new Error(
-        'You must provide an authentication strategy as an argment.'
-      );
+      throw new Error('You must provide an authentication strategy as an argment.');
     }
     const currStrat = this._strategies[strategy];
     if (!currStrat) {
@@ -133,10 +137,7 @@ export default class Onyx {
           context.state.onyx.session
         );
 
-        await this.funcs.deserializer(userIDVal, function (
-          err: any,
-          user: any
-        ) {
+        await this.funcs.deserializer(userIDVal, function (err: any, user: any) {
           if (err) throw new Error(err);
           else if (!user) {
             // so active session found but userIDVal does not return an user from userDB
