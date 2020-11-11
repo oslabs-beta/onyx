@@ -31,8 +31,8 @@ export default () => {
     }
   });
 
-  onyx.use(new LocalStrategy(userController.verifyUser));
-  // onyx.use('any');
+  // onyx.use(new LocalStrategy(userController.verifyUser));
+  onyx.use('any');
 };
 
 // saving the LocalStrategy onto onyx._strategies['local'] to be invoked in onyx.authenticate('local')

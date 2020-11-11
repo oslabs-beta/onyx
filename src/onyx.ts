@@ -35,6 +35,7 @@ export default class Onyx {
       this._strategies[name] = strategy;
       return this;
     } catch (err) {
+      console.log('hello from catch');
       return err;
     }
   }
