@@ -8,9 +8,12 @@ export default function authenticate(
     callback = options;
     options = {};
   }
+  // 11.10 *resolved* if neither options nor callback were passed in, we still want to define options as an empty object
+  options = options || {};
 
   let multi = true;
 
+  console.log('in authenticate middleware line 14');
   // ref: passport/lib/middleware/authenticate.js line 84
   // ex: name = ['basic', 'digest', 'token']
   if (!Array.isArray(name)) {
@@ -30,6 +33,7 @@ export default function authenticate(
 
     // if every strategy failed, invoke the callback if developer provided as an argument when invoking onyx.authenticate('strategyName', cb)
     async function allFailed() {
+      console.log(`in allFailed`);
       if (callback) {
         if (!multi) {
           // not sure if return or await so if needed, will come back 11.8
@@ -78,10 +82,9 @@ export default function authenticate(
           rchallenge.push(challenge);
         }
       });
-
       context.response.status = rstatus || 401;
       if (context.response.status === 401 && rchallenge.length) {
-        context.response.headers = { 'WWW-Authenticate': rchallenge };
+        context.response.headers.set('WWW-Authenticate', rchallenge);
       }
 
       // options.failWithError not implemented
@@ -89,14 +92,14 @@ export default function authenticate(
 
     // going through the name array, getting the strategy from onyx._strategy, and adding on the action functions
     await (async function attempt(i) {
+      console.log(
+        `in authenticate middleware, attempt #${i} with onyx._strategies ${onyx._strategies[i]}`
+      );
       const layer = name[i];
       // 11.8 *note* might need await
       if (!layer) return allFailed();
 
       // 11.8 In passport, used const prototype = onyx._strategy(layer), not sure, same as onyx._strategies[layer]
-      console.log(
-        `in authenticate middleware, attemp #${i} with onyx._strategies ${onyx._strategies}`
-      );
       const prototype = onyx._strategies[layer];
 
       if (!prototype) {
@@ -106,15 +109,18 @@ export default function authenticate(
       }
 
       const strategy = Object.create(prototype);
+      console.log('prototype is', prototype);
+      console.log('strategy is', strategy);
+      console.log('strategy has __proto__', Object.getPrototypeOf(strategy));
 
-      strategy.success = async function (user: object, info?: any) {
+      strategy.funcs.success = async function (user: object, info?: any) {
         console.log('in authenticate .success()');
         if (callback) return callback(null, user, info);
 
         info = info || {};
         let msg;
 
-        if (options.successMessage) {
+        if (options?.successMessage) {
           if (typeof options.successMessage === 'boolean') {
             msg = info.message || info;
           } else msg = options.successMessage;
@@ -135,7 +141,9 @@ export default function authenticate(
         //   if ()
         // }
 
-        context.state.logIn(user, options, onyx, async function (err: any) {
+        await context.state.logIn(context, user, onyx, async function (
+          err: any
+        ) {
           if (err) {
             throw new Error(err);
           }
@@ -150,16 +158,17 @@ export default function authenticate(
           // if (options.authInfo !== false) {
           //   //transformAuthInfo
           // }
-
+          console.log('in cb of logIn, options is', options);
           await complete();
         });
       }; // end of success function
 
-      strategy.fail = async function (challenge: any, status?: number) {
+      strategy.funcs.fail = async function (challenge: any, status?: number) {
         if (typeof challenge === 'number') {
           status = challenge;
           challenge = undefined;
         }
+        console.log(`in fail with challenge ${challenge} and status ${status}`);
         failures.push({ challenge, status });
         attempt(i + 1);
       };
@@ -167,25 +176,32 @@ export default function authenticate(
       // redirect function for Oauth - might be able to depend on Oak's redirect
 
       // for anonymous
-      strategy.pass = async function () {
+      strategy.funcs.pass = async function () {
         next && (await next());
       };
 
-      strategy.error = async function (err: any) {
+      strategy.funcs.error = async function (err: any) {
         if (callback) {
           return callback(err);
         }
         next && (await next());
       };
 
+      strategy.funcs.test = async function () {
+        console.log('strategy.test invoked');
+        next && (await next());
+      };
       // now we are ready to invoke the authenticate function on the current Strategy
       // 11/8 *note* what are the arguments to pass in?
-      strategy.authenticate(context, options);
+      console.log(
+        'in authenticate middleware, strategy has the following properties',
+        Object.keys(strategy)
+      );
+
+      await strategy.authenticate(context, options);
+      console.log(
+        'in authenticate middleware, local-strategy.authenticate has completed'
+      );
     })(0);
   };
 }
-
-// if (options.assignProperty) {
-//   req[options.assignProperty] = user;
-//   return next();
-// }

@@ -9,7 +9,7 @@ export default class SessionManager {
     this._serializeUser = serializeUser;
   }
 
-  // onyx.authenticate() will invoke this on /login path, but on /register path developer will have to invoke this function using 
+  // onyx.authenticate() will invoke this on /login path, but on /register path developer will have to invoke this function using
   // context.state.onyx._sm.logIn ---- would be better if we can add to context.logIn or something similar
   logIn = async (context: any, user: any, onyx: any, cb: Function) => {
     // in server, developer will define where the id is located on the user object and pass that as 2nd arg in done
@@ -17,10 +17,17 @@ export default class SessionManager {
     //    done(null, user.id);
     // });
 
-    // in onyx initialize, fixed so that context.state.onyx is the onyx object created in the server and not a new instance of Onyx.  
+    // in onyx initialize, fixed so that context.state.onyx is the onyx object created in the server and not a new instance of Onyx.
     // so now calling for the serializeUser function will be in the instance of onyx that has the funcs property with the serializer and deserializer
+
+    // 11.10 *note* we somehow now have access to this (??), is it because of the new way of importing in onyx-setup?? -- both onyxSetup() with setup being a function and importing entire file works. what else did we do?
+    // moving the content of onyxSetup to server line 11 works
+    // moving to line 37 after session.init() works
+    // moving to line 79 after session.use() and before onyx.initialize() works
+
     const serializer = await this._serializeUser();
     console.log('what is this._serializer in sessionManager', serializer);
+    console.log(String(serializer));
 
     // onyx.funcs.serializer === async func passed in onyx.serializeUser
     // basically the done function that we see in the serialize & deserialize
@@ -56,7 +63,7 @@ export default class SessionManager {
       console.log('session set for user in sessionManager', userIDVal);
 
       // REFACTOR next-middleware
-      cb(); // CHANGE # 1 - TESTED - still works without await b/c last middleware?
+      await cb(); // CHANGE # 1 - TESTED - still works without await b/c last middleware?
       console.log('after the await cb of sessionManager');
     });
 
@@ -84,7 +91,7 @@ export default class SessionManager {
       // const userIDVal = await context.state.session.get('userIDKey');
       // console.log('session for user after logout', userIDVal);
 
-      // Redis Memory untested. Server Memory will actually delete the entire entry with the sidCookie key. Should we try figure out how to remove 
+      // Redis Memory untested. Server Memory will actually delete the entire entry with the sidCookie key. Should we try figure out how to remove
       // just the UserIDKey property instead?
     }
 
