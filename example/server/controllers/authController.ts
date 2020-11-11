@@ -16,8 +16,8 @@ userController.createUser = async (ctx: any, next: any) => {
   } else {
     ctx.response.body = {
       success: true,
-      message: 'need input, body is empty'
-    }
+      message: 'need input, body is empty',
+    };
   }
   await next();
 };
@@ -33,8 +33,6 @@ userController.verifyUser = async (context: any, done: Function) => {
       console.log('password matched');
       // CHANGE - 5TH await --- TESTED - it's necessary
       await done(null, user);
-
-      // return done(null, user);
     } else {
       await done(null);
     }
