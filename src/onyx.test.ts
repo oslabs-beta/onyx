@@ -3,8 +3,11 @@ import { app } from '../example/server/server.tsx';
 import SessionManager from './sessionManager.ts';
 import Strategy from './strategy.ts';
 import SessionStrategy from './strategies/session-strategy.ts';
-import LocalStrategy from './strategies/local-strategy.ts';
-import { assertEquals, assertArrayIncludes } from 'https://deno.land/std@0.76.0/testing/asserts.ts';
+import LocalStrategy from './strategies/local-strategy/local-strategy.ts';
+import {
+  assertEquals,
+  assertArrayIncludes,
+} from 'https://deno.land/std@0.76.0/testing/asserts.ts';
 import Onyx from './onyx.ts';
 import userController from '../example/server/controllers/authController.ts';
 

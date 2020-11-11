@@ -32,8 +32,7 @@ await session.init();
 
 // Error Notification
 app.addEventListener('error', (event) => {
-  log.warning(JSON.stringify(event.error));
-  // log.error(event);
+  log.error(event);
 });
 
 // Error Handling
@@ -110,37 +109,36 @@ app.use(async (ctx, next) => {
     await send(ctx, filePath, {
       root: join(Deno.cwd(), 'example/views/assets'),
     });
-  } else if (method === 'GET' && filePath === '/protected') {
-    if (!ctx.state.onyx.session) {
-      log.warning('Hmm...It appears that your session is UNDEFINED');
-    }
-    if (ctx.state.onyx.session !== undefined) {
-      log.warning(ctx.state.onyx.session);
-    }
-    //    log.warning(ctx.state.onyx.session);
-    if (ctx.state.onyx.session?.user) {
-      log.info('session found, proceed to protected');
-      const { username } = ctx.state.onyx.session.user;
-      ctx.response.body = {
-        success: true,
-        isAuth: true,
-        username,
-      };
-    } else {
-      log.info('session not found, proceed to login');
-      ctx.response.body = {
-        success: true,
-        isAuth: false,
-      };
-    }
   }
+  // else if (method === 'GET' && filePath === '/protected') {
+  //   if (!ctx.state.onyx.session) {
+  //     log.warning('Hmm...It appears that your session is UNDEFINED');
+  //   }
+  //   if (ctx.state.onyx.session !== undefined) {
+  //     log.warning(ctx.state.onyx.session);
+  //   }
+  //   //    log.warning(ctx.state.onyx.session);
+  //   if (ctx.state.onyx.session?.user) {
+  //     log.info('session found, proceed to protected');
+  //     const { username } = ctx.state.onyx.session.user;
+  //     ctx.response.body = {
+  //       success: true,
+  //       isAuth: true,
+  //       username,
+  //     };
+  //   } else {
+  //     log.info('session not found, proceed to login');
+  //     ctx.response.body = {
+  //       success: true,
+  //       isAuth: false,
+  //     };
+  //   }
+  // }
   // else await next();
 });
 
 // Error handler missing path?
-// coming into here will break the server
 // app.use(async (ctx) => {
-//   // Will throw a 500 on every request.  ??????
 //   log.error('finally in error handler of the end');
 //   ctx.throw(500);
 // });

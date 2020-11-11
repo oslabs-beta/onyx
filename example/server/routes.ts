@@ -8,46 +8,50 @@ import onyx from '../../mod.ts';
 const router = new Router();
 
 // 11.10 *todo* separate session-strategy? consolidate all the options?
-
-// 11.10 *note* register -> login works!
 router.post('/register', async (ctx) => {
-  if (ctx.request.hasBody) {
-    const body = await ctx.request.body();
-    const { username, password } = await body.value;
-    const _id = await User.insertOne({ username, password });
-    console.log('id from database is', _id);
-    const user = { username, _id };
+  const body = await ctx.request.body();
+  const { username, password } = await body.value;
+  const _id = await User.insertOne({ username, password });
 
-    // 11.8 *note* need to invoke login with args
-    await ctx.state.logIn(ctx, user, onyx, async (err: any) => {
-      if (err) return ctx.throw(err);
-      else {
-        ctx.response.body = {
-          success: true,
-          message: user,
-        };
-      }
-    });
-  } else {
-    ctx.response.body = {
-      success: true,
-      message: 'need input, body is empty',
-    };
-  }
+  // option 1: construct a user object and invoke ctx.state.logIn
+  const user = { username, _id };
+  await ctx.state.logIn(ctx, user, onyx, async (err: any) => {
+    if (err) return ctx.throw(err);
+    else {
+      ctx.response.body = {
+        success: true,
+        message: user,
+      };
+    }
+  });
+
+  // option 2: invoke onyx.authenticate - see login route for reference
 });
 
-// Passport  req.login(user, options?, function)
-// req.login(user, function(err) {
-//   if (err) { return next(err); }
-//   return res.redirect('/users/' + req.user.username);
-// });
+router.post('/login', async (ctx) => {
+  await (await onyx.authenticate('local'))(ctx);
 
-router.get('/login', async (ctx) => {
-  ctx.response.body = {
-    success: false,
-    message: 'temporary failure redirect',
-  };
-  console.log('in route.get login');
+  if (await ctx.state.isAuthenticated()) {
+    const user = ctx.state.onyx.user;
+    console.log('user object in login route is', user);
+    const sessionUser = ctx.state.onyx.session.user;
+    console.log('sessionUser object in login is', sessionUser);
+
+    const userObj = await ctx.state.getUser();
+    console.log('userObj from getUser is', userObj);
+    // return ctx.state.onyx.session.user
+
+    ctx.response.body = {
+      success: true,
+      message: user,
+    };
+  } else {
+    const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
+    ctx.response.body = {
+      success: false,
+      message,
+    };
+  }
 });
 
 router.get('/logout', async (ctx) => {
@@ -59,27 +63,23 @@ router.get('/logout', async (ctx) => {
   };
 });
 
-router.post('/login', async (ctx, next) => {
-  await (await onyx.authenticate('local'))(ctx);
-
-  console.log('in callback func of /login');
+router.get('/protected', async (ctx) => {
   if (await ctx.state.isAuthenticated()) {
-    console.log('in good login response');
+    console.log('session found, proceed to protected');
+    const { username } = ctx.state.onyx.session.user;
     const user = ctx.state.onyx.user;
+    console.log('user found from onyx.user in protected route is', user);
     ctx.response.body = {
       success: true,
-      message: user,
+      isAuth: true,
+      username,
     };
   } else {
-    console.log('in bad login response');
-    const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
+    console.log('session not found, proceed to login');
     ctx.response.body = {
-      success: false,
-      message,
+      success: true,
+      isAuth: false,
     };
   }
 });
-
-// router.get('/protected', sessionController.checkSession);
-
 export default router;

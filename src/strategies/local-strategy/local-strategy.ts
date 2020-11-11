@@ -1,4 +1,4 @@
-import Strategy from '../strategy.ts';
+import Strategy from '../../strategy.ts';
 
 /* Create local strategy
  *
