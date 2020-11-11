@@ -1,16 +1,16 @@
-// import { superoak } from '../test_deps.ts';  
+// import { superoak } from '../test_deps.ts';
 // import { app } from '../server/server.tsx'
-// 
-// Deno.test('it should support the Oak framework', async() => {  
+//
+// Deno.test('it should support the Oak framework', async() => {
 //   console.log('hello from test')
 //   const request = await superoak(app);
 //   await request.get('/').expect('a lot of stuff, do we add in html version of app here?')
 // })
 
 import { superoak, describe, it, expect } from '../../test_deps.ts';
-import { app } from '../server/server.tsx'
+import { app } from '../server/server.tsx';
 
-// IIFE 
+// IIFE
 // ************Uncomment below
 // describe('GET request to root url', () => {
 //   it('Sends 200 Status and Content Type text/html', async (done: any) => {
@@ -44,12 +44,12 @@ import { app } from '../server/server.tsx'
 //   });
 // });
 //**********Un comment above */
-  
+
 // NOTES: If one test faill, it will throw an error not reach the done().  It will end the test at that point, even if there are more tests after.
 
 // describe('GET request to root url testing promise', () => {
 //   it('Sends 200 Status and Content Type text/html', async (done: any) => {
-    
+
 //     const oaktest: any = async () => {
 //       (await superoak(app)).get('/').end((err, res) => {
 //         expect(res.status).toEqual(200);
