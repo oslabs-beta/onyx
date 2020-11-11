@@ -32,11 +32,7 @@ await session.init();
 
 // Error Notification
 app.addEventListener('error', (event) => {
-<<<<<<< HEAD
-  log.warning(JSON.stringify(event.error));
-=======
   log.error(event);
->>>>>>> main
 });
 
 // Error Handling
