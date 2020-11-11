@@ -1,17 +1,20 @@
 import SessionManager from './sessionManager.ts';
 import Strategy from './strategy.ts';
+import authenticate from './middleware/authenticate.ts';
 // import SessionStrategy from './strategies/session-strategy.ts';
 
 export default class Onyx {
   private _sm: any;
   private _strategies: any;
   private _userProperty: string;
+  private _framework: { authenticate: Function };
   public funcs: any;
 
   constructor() {
     this._strategies = {};
     this._userProperty = 'user';
     this.funcs = {};
+    this._framework = { authenticate };
     this.init();
   }
 
@@ -77,17 +80,25 @@ export default class Onyx {
     options?: { successRedirect?: string; failureRedirect?: string },
     callback?: Function
   ) {
-    if (!strategy) {
-      throw new Error('You must provide an authentication strategy as an argment.');
-    }
-    const currStrat = this._strategies[strategy];
-    if (!currStrat) {
-      throw new Error(
-        "The argued strategy is not a valid strategy. Did you remember to invoke 'onyx.use'?"
-      );
-    }
-    console.log('hello from onyx.authenticate with currStrat', currStrat);
-    return currStrat.authenticate(this, options, callback);
+    // 11.9 *experimental* invoke authenticate middleware
+    return this._framework.authenticate(this, strategy, options, callback);
+
+    // 11.9 *note* don't need to check if strategy was passed in since Typescript will make sure for us that developer is passing in at least 1 string as arg
+    // if (!strategy) {
+    //   throw new Error(
+    //     'You must provide an authentication strategy as an argment.'
+    //   );
+    // }
+
+    // 11.9 this is for jumping directly into local-strategy
+    // const currStrat = this._strategies[strategy];
+    // if (!currStrat) {
+    //   throw new Error(
+    //     "The argued strategy is not a valid strategy. Did you remember to invoke 'onyx.use'?"
+    //   );
+    // }
+    // console.log('hello from onyx.authenticate with currStrat', currStrat);
+    // return currStrat.authenticate(this, options, callback);
   }
 
   // 11.7 *note* does serializerUser ever take in context?
@@ -126,6 +137,18 @@ export default class Onyx {
       context.state.logOut = context.state.logout = this._sm.logOut;
       context.state.logIn = context.state.login = this._sm.logIn;
 
+      context.state.isAuthenticated = function () {
+        if (context.state.onyx.session !== undefined) return true;
+        else return false;
+      };
+
+      context.state.isUnauthenticated = function () {
+        return !context.state.isAuthenticated();
+      };
+
+      if (context.state.session === undefined) {
+        throw new Error('Must set up Session before Onyx');
+      }
       const userIDVal = await context.state.session.get('userIDKey');
 
       // We won't enter this statement the first time we visit a website, since there isn't an existing session
