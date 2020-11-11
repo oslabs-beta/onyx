@@ -173,8 +173,6 @@ export default function authenticate(
         attempt(i + 1);
       };
 
-      // redirect function for Oauth - might be able to depend on Oak's redirect
-
       // for anonymous
       strategy.funcs.pass = async function () {
         next && (await next());
@@ -187,12 +185,6 @@ export default function authenticate(
         next && (await next());
       };
 
-      strategy.funcs.test = async function () {
-        console.log('strategy.test invoked');
-        next && (await next());
-      };
-      // now we are ready to invoke the authenticate function on the current Strategy
-      // 11/8 *note* what are the arguments to pass in?
       console.log(
         'in authenticate middleware, strategy has the following properties',
         Object.keys(strategy)

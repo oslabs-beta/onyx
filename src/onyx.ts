@@ -126,12 +126,9 @@ export default class Onyx {
   initialize(options?: { userProperty?: 'string' }) {
     return async (context: any, next: Function) => {
       // each connection should have it's own instance of Onyx
-      // can only add property on context.state which'll persist while server is active,unlike the req obj of express which is unique for ea connection
       context.state.onyx = new Onyx();
 
       this._userProperty = options?.userProperty || 'user';
-
-      // if we want to accomodate other frameworks, the following needs to be in an 'oak.tsx' file to be imported in as the framework
 
       // adding the logIn and logOut to context.state for developer to invoke in the register and logout path
       context.state.logOut = context.state.logout = this._sm.logOut;
@@ -144,6 +141,13 @@ export default class Onyx {
 
       context.state.isUnauthenticated = function () {
         return !context.state.isAuthenticated();
+      };
+
+      context.state.getUser = function () {
+        // if session property not found, return undefined
+        if (!context.state.onyx.session) return;
+        // otherwise return the user object
+        return context.state.onyx.session.user;
       };
 
       if (context.state.session === undefined) {
@@ -161,7 +165,10 @@ export default class Onyx {
           context.state.onyx.session
         );
 
-        await this.funcs.deserializer(userIDVal, function (err: any, user: any) {
+        await this.funcs.deserializer(userIDVal, function (
+          err: any,
+          user: any
+        ) {
           if (err) throw new Error(err);
           else if (!user) {
             // so active session found but userIDVal does not return an user from userDB
