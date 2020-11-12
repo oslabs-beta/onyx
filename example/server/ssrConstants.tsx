@@ -9,7 +9,7 @@ import Protected from '../views/components/Protected.tsx';
 
 const browserBundlePath: string = '/browser.js';
 
-const html: string = `<html><head><script type="module" src="${browserBundlePath}"></script><link rel="stylesheet" href="style.css" type="text/css"><style>* { font-family: Helvetica; }</style></head><body><div id="root">${(ReactDOMServer as any).renderToString(
+const html: string = `<html><head><script type="module" src="${browserBundlePath}"></script><link rel="stylesheet" href="style.css" type="text/css"><style>* { font-family: Helvetica; }</style><link rel='icon' type='image/png' href='https://i.imgur.com/ALQnrfR.png'></head><body><div id="root">${(ReactDOMServer as any).renderToString(
   <App />
 )}</div></body></html>`;
 

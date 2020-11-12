@@ -1,17 +1,7 @@
-import { superoak, describe, it, expect } from '../test_deps.ts';
-import { app } from '../example/server/server.tsx';
-import SessionManager from './sessionManager.ts';
-import Strategy from './strategy.ts';
-import SessionStrategy from './strategies/session-strategy.ts';
-import LocalStrategy from './strategies/local-strategy/local-strategy.ts';
-import {
-  assertEquals,
-  assertArrayIncludes,
-} from 'https://deno.land/std@0.76.0/testing/asserts.ts';
 import Onyx from './onyx.ts';
-import userController from '../example/server/controllers/authController.ts';
+import Strategy from './strategy.ts';
+import { describe, it, expect, assertThrowsAsync } from '../test_deps.ts';
 
-// 11.9 starting test
 describe('Onyx', () => {
   describe('#use', () => {
     describe('with instance name', () => {
@@ -26,18 +16,174 @@ describe('Onyx', () => {
       const onyx = new Onyx();
       onyx.use(new testStrategy());
 
-      it('should register strategy', async (done: any) => {
+      it('Onyx #use should register strategy', async (done: any) => {
         expect(typeof onyx['_strategies']['default']).toEqual('object');
 
         done();
       });
 
-      // works with return error but not with throw
-      it('should throw an error if Strategy is not provided in onyx.use', async (done: any) => {
-        const result = await onyx.use('default');
-        expect(result).toBeInstanceOf(Error);
+      it('Onyx #use should throw an error if Strategy is not provided in onyx.use', async (done: any) => {
+        assertThrowsAsync(
+          (): Promise<any> => {
+            return new Promise((): void => {
+              onyx.use('default');
+            });
+          },
+          Error,
+          'Strategy needs to be provided!'
+        );
         done();
       });
+
+      it('Onyx #use should throw an error if input Strategy does not have name', async (done: any) => {
+        class namelessStrategy extends Strategy {
+          constructor() {
+            super();
+          }
+        }
+
+        assertThrowsAsync(
+          (): Promise<any> => {
+            return new Promise((): void => {
+              onyx.use(new namelessStrategy());
+            });
+          },
+          Error,
+          'Authentication strategies must have a name!'
+        );
+        done();
+      });
+
+      it('Onyx #use should register strategy with custom name', async (done: any) => {
+        const stratInstance: any = new testStrategy();
+        const stratInstance2: any = new testStrategy();
+        onyx.use('new name', stratInstance);
+        expect(typeof onyx['_strategies']['new name']).toEqual('object');
+        // assertObjectMatch(onyx['_strategies']['default'], stratInstance2);
+        done();
+      });
+    });
+  });
+
+  describe('#serializeUser', () => {
+    describe('missing setup', () => {
+      const onyx = new Onyx();
+      it('Onyx #serializeUser - missing setup - should throw an Error if no serialize function was registered', (done) => {
+        assertThrowsAsync(
+          (): Promise<any> => {
+            return new Promise((): void => {
+              onyx.serializeUser();
+            });
+          },
+          Error,
+          'Serialize Function not registered!'
+        );
+        done();
+      });
+    });
+
+    describe('with setup', () => {
+      const onyx = new Onyx();
+
+      const serializer = async function (user: any, cb: Function) {
+        await cb(null, user.id);
+      };
+      onyx.serializeUser(serializer);
+
+      it('Onyx #serializeUser - should should store the passed in function', async (done) => {
+        expect(typeof onyx.funcs.serializer).toEqual('function');
+        expect(onyx.funcs.serializer).toBe(serializer);
+        done();
+      });
+
+      it('Onyx #serializeUser - should returned the stored function when invoked without an argument', async (done) => {
+        expect(typeof onyx.serializeUser()).toEqual('function');
+        expect(onyx.serializeUser()).toBe(serializer);
+        done();
+      });
+    });
+  });
+
+  describe('#deserializeUser', () => {
+    describe('missing setup', () => {
+      const onyx = new Onyx();
+      it('Onyx #deserializeUser - missing setup - should throw an Error if no deserialize function was registered', (done) => {
+        assertThrowsAsync(
+          (): Promise<any> => {
+            return new Promise((): void => {
+              onyx.deserializeUser();
+            });
+          },
+          Error,
+          'Deserialize Function not registered!'
+        );
+        done();
+      });
+    });
+
+    describe('with setup', () => {
+      const onyx = new Onyx();
+
+      const serializer = async function (user: any, cb: Function) {
+        await cb(null, user.id);
+      };
+
+      const deserializer = async function (id: string, cb: Function) {
+        const _id = { $oid: id };
+        try {
+          const user = { username: 'Alice', _id };
+          await cb(null, user);
+        } catch (error) {
+          await cb(error, null);
+        }
+      };
+      onyx.deserializeUser(deserializer);
+
+      it('Onyx #deserializeUser - should should store the passed in function', async (done) => {
+        expect(typeof onyx.funcs.deserializer).toEqual('function');
+        expect(onyx.funcs.deserializer).toBe(deserializer);
+        done();
+      });
+
+      it('Onyx #deserializeUser - should returned the stored function when invoked without an argument', async (done) => {
+        expect(typeof onyx.deserializeUser()).toEqual('function');
+        expect(onyx.deserializeUser()).toBe(deserializer);
+        done();
+      });
+    });
+  });
+
+  describe('#initialize', () => {
+    class Context {
+      public state: any;
+      constructor() {
+        this.state = {};
+      }
+    }
+
+    const ctx = new Context();
+    const onyx = new Onyx();
+
+    // it('Onyx #initialize should throw error if session not set up', async (done) => {
+    //   assertThrowsAsync(
+    //     (): Promise<any> => {
+    //       return new Promise((): void => {
+    //         onyx.initialize()(ctx, () => {});
+    //       });
+    //     },
+    //     Error,
+    //     'Must set up Session before Onyx!'
+    //   );
+    //   done();
+    // });
+
+    it('Onyx #initialize should create a new instance of Onyx', async (done) => {
+      ctx.state.session = {
+        get: (str: string) => undefined,
+      };
+      onyx.initialize()(ctx, () => {});
+      expect(ctx.state.onyx).toBeInstanceOf(Onyx);
+      done();
     });
   });
 
@@ -58,12 +204,4 @@ describe('Onyx', () => {
       done();
     });
   });
-
-  // NEED TO WORK ON SERIALIZEUSER
-  // describe('#serializeUser', () => {
-  //   describe('without serializers', () => {
-  //     const onyx = new Onyx();
-
-  //   });
-  // });
 });

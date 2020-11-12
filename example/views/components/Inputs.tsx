@@ -35,7 +35,7 @@ const Inputs: any = (props: any) => {
         setUsername('');
         setPassword('');
         // if data.success is true, set page to 'protected'
-        if (data.success) setPage('protected');
+        if (data.isAuth) setPage('protected');
       })
       .catch((e) => {
         console.log(e);
