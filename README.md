@@ -10,7 +10,7 @@ Onyx's primary concern is keeping code clean and organized. Through the use of s
 All you need is one line to get started.
 
 ```typescript
-import Onyx from https://deno.land/x/onyx@v1.0/mod.ts
+import Onyx from 'https://deno.land/x/onyx@v1.0/mod.ts'
 ```
 
 When you import the Onyx module, what you're really importing is an object called 'Onyx' that has a number of built-in methods. A couple of those methods you will need to use as [Oak](https://deno.land/x/oak@v6.3.1) middleware to use Onyx. Others are primarily used by Onyx under the hood to assist with the authentication process. However, if you are a developer interested in creating new or custom strategies for Onyx, it will likely be important to understand how these work.
