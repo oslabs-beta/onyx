@@ -1,6 +1,9 @@
 ![Onyx Logo](https://i.imgur.com/SglpX1j.png)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e21761c56fbdfd3af97706b84e8a2ce6d7d2b96c
 Welcome to Onyx!
 
 Onyx is authentication middleware for Deno, inspired by [Passport.js](http://www.passportjs.org/). Like Passport, Onyx prioritizes modularization and flexibility — it abstracts much of the authentication process away yet leaves exact control of the verification procedure up to the developer.
