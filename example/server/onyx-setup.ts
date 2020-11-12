@@ -24,14 +24,19 @@ onyx.deserializeUser(async function (id: string, cb: Function) {
 // onyx.use(new LocalStrategy(userController.verifyUser));
 
 onyx.use(
-  new LocalStrategy(async (context: any, done: Function) => {
-    const { username, password } = context.state.onyx.user;
-    try {
-      const user = await User.findOne({ username });
-      if (user && password === user.password) await done(null, user);
-      else await done(null);
-    } catch (error) {
-      await done(error);
+  new LocalStrategy(
+    async (username: string, password: string, done: Function) => {
+      // const { username, password } = context.state.onyx.user;
+      console.log(
+        `verify function invoked with username ${username} and password ${password}`
+      );
+      try {
+        const user = await User.findOne({ username });
+        if (user && password === user.password) await done(null, user);
+        else await done(null);
+      } catch (error) {
+        await done(error);
+      }
     }
-  })
+  )
 );
