@@ -21,7 +21,7 @@ const Inputs: any = (props: any) => {
       // can't do alert, don't know why
       return;
     }
-    console.log(username, password);
+
     fetch(`/${path}`, {
       method: 'POST',
       body: JSON.stringify({ username, password }),

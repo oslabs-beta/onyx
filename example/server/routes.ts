@@ -31,7 +31,6 @@ router.post('/login', async (ctx) => {
 
   if (await ctx.state.isAuthenticated()) {
     const user = await ctx.state.getUser();
-    console.log('userObj from getUser is', user);
 
     ctx.response.body = {
       success: true,
@@ -48,7 +47,6 @@ router.post('/login', async (ctx) => {
 
 router.get('/logout', async (ctx) => {
   await ctx.state.logOut(ctx);
-  console.log('in logout!');
   ctx.response.body = {
     success: true,
     isAuth: false,
@@ -65,7 +63,6 @@ router.get('/protected', async (ctx) => {
       username,
     };
   } else {
-    console.log('session not found, proceed to login');
     ctx.response.body = {
       success: true,
       isAuth: false,

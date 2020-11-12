@@ -25,7 +25,6 @@ export default function authenticate(
     const failures: Array<failureObj> = [];
 
     async function allFailed() {
-      console.log(`in allFailed`);
       if (callback) {
         if (!multi) {
           return callback(
@@ -79,9 +78,6 @@ export default function authenticate(
     }
 
     await (async function attempt(i) {
-      console.log(
-        `in authenticate middleware, attempt #${i} with onyx._strategies ${onyx._strategies[i]}`
-      );
       const layer = name[i];
       if (!layer) return allFailed();
 
@@ -133,7 +129,6 @@ export default function authenticate(
           status = challenge;
           challenge = undefined;
         }
-        console.log(`in fail with challenge ${challenge} and status ${status}`);
         failures.push({ challenge, status });
         attempt(i + 1);
       };
