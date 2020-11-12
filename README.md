@@ -18,7 +18,7 @@ First, though, let's go over Onyx's most vital methods: `onyx.use()`, `onyx.auth
 ### onyx.use
 `onyx.use()` configures and stores a strategy to to be implemented later on by Onyx. This step must be completed first in order to continue authentication process. After all, without a strategy, Onyx doesn't have anything to use to complete the authentication process.
 
-onyx.authenticate
+### onyx.authenticate
 `onyx.authenticate()` is the heart of Onyx — it's what you will use to initiate an authenticate process.
 
 When you want to authenticate a user, simply invoke `onyx.authenticate()` and pass in a reference to the strategy you stored with onyx.use() above.
