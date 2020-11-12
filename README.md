@@ -21,6 +21,23 @@ First, though, let's go over Onyx's most vital methods: `onyx.use()`, `onyx.auth
 ### onyx.use
 `onyx.use()` configures and stores a strategy to to be implemented later on by Onyx. This step must be completed first in order to continue authentication process. After all, without a strategy, Onyx doesn't have anything to use to complete the authentication process.
 
+```typescript
+onyx.use(new LocalStrategy(async (context: any, done: Function) => {
+  const { username, password } = context.state.onyx.user;
+  
+  try {
+    const user = await User.findOne({ username });
+    if (user && password === user.password) {
+      await done(null, user);
+     } else {
+       await done(null);
+     }
+  } catch (error) {
+    await done(error);
+  }
+}));
+```
+
 ### onyx.authenticate
 `onyx.authenticate()` is the heart of Onyx — it's what you will use to initiate an authenticate process.
 
