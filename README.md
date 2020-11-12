@@ -1,4 +1,4 @@
-# Onyx
+# Welcome to Onyx!
 
 Onyx is authentication middleware for Deno inspired by Passport.js. Like Passport, Onyx prioritizes modularization and flexibility — it abstracts much of the authentication process away yet leaves exact control of the verification procedure up to the developer.
 
@@ -21,7 +21,7 @@ First, though, let's go over Onyx's most vital methods: `onyx.use()`, `onyx.auth
 ### onyx.authenticate
 `onyx.authenticate()` is the heart of Onyx — it's what you will use to initiate an authenticate process.
 
-When you want to authenticate a user, simply invoke `onyx.authenticate()` and pass in a reference to the strategy you stored with onyx.use() above.
+When you want to authenticate a user, simply invoke `onyx.authenticate()` and pass in a reference to the strategy you stored with `onyx.use()` above.
 
 ### onyx.initialize
 As you might expect, `onyx.initialize()` creates a new instance of Onyx for each user and sets up its initial state. Though it's a simple line of code, it is vital for ensuring Onyx autehnticates each individual user properly.
@@ -39,7 +39,7 @@ Stores a callback you write that will be invoked later upon successful verificat
 While the following methods are not required to authenticate with Onyx, you may find them useful to understand if you are creating a custom strategy.
 
 ### onyx.unuse
-`onyx.unuse()` does exactly what it sounds like it does: It deletes the strategy you stored when using onyx.use().
+`onyx.unuse()` does exactly what it sounds like it does: It deletes the strategy you stored when using `onyx.use()`.
 
 ### onyx.init
 `onyx.init()` is invoked every time a new instance of an Onyx object is created. It creates an instance of the session manager, which controls and creates user sessions.
