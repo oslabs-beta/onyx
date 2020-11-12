@@ -40,17 +40,6 @@ export default class Onyx {
     return this;
   }
 
-  /* Options:   *note* *README*
-   *   - `successRedirect`  After successful login, redirect to given URL
-   *   - `successMessage`   True to store success message in
-   *                        req.session.messages, or a string to use as override
-   *                        message for success.
-   *   - `failureRedirect`  After failed login, redirect to given URL
-   *   - `failureMessage`   True to store failure message in
-   *                        req.session.messages, or a string to use as override
-   *                        message for failure.
-   */
-
   authenticate(
     strategy: string,
     options?: {
@@ -64,22 +53,32 @@ export default class Onyx {
     return this._framework.authenticate(this, strategy, options, callback);
   }
 
-  serializeUser(fn: Function) {
+  serializeUser(fn?: Function) {
     if (typeof fn === 'function') {
       return (this.funcs.serializer = fn);
+    }
+    if (!this.funcs.serializer) {
+      throw new Error('Serialize Function not registered!');
     }
     return this.funcs.serializer;
   }
 
-  deserializeUser(fn: Function) {
+  deserializeUser(fn?: Function) {
     if (typeof fn === 'function') {
       return (this.funcs.deserializer = fn);
+    }
+    if (!this.funcs.deserializer) {
+      throw new Error('Deserialize Function not registered!');
     }
     return this.funcs.deserializer;
   }
 
-  initialize(options?: { userProperty?: 'string' }) {
+  initialize() {
     return async (context: any, next: Function) => {
+      if (!context.state) {
+        throw new Error('Please use onyx.initialize in app.use()');
+      }
+
       context.state.onyx = new Onyx();
 
       // Check if Session has been set up for the server

@@ -1,10 +1,11 @@
-// deps only used in testing and not in production
-
 // Deno Tests
 export {
   assertEquals,
   assertNotEquals,
-} from "https://deno.land/std@0.74.0/testing/asserts.ts";
+  assertObjectMatch,
+  assertThrowsAsync,
+  assertThrows,
+} from 'https://deno.land/std@0.77.0/testing/asserts.ts';
 
 // SuperOak
 export { superoak } from 'https://deno.land/x/superoak@2.3.1/mod.ts';
