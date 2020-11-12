@@ -17,7 +17,15 @@ When you import the Onyx module, what you're really importing is an object calle
 
 ## Where to Start
 
-First, though, let's go over Onyx's most vital methods: `onyx.use()`, `onyx.authenticate()` and `onyx.initialize()`.
+Before doing anything else, it's important to import the authentication strategies you want to use in your application. These strategies are available on our [website](http://onyxts.land) and on our [Deno.land page](https://deno.land/x/onyx@v1.0/src/strategies).
+
+For example, importing in the local strategy looks like this.
+
+```typescript
+import LocalStrategy from 'deno.land/x/onyx@v1.0/src/strategies/local-strategy/local-strategy.ts'
+```
+
+Next, let's go over Onyx's most vital methods: `onyx.use()`, `onyx.authenticate()` and `onyx.initialize()`.
 
 ### onyx.use
 
