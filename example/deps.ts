@@ -4,6 +4,13 @@ export * as log from 'https://deno.land/std@0.74.0/log/mod.ts';
 
 // Third Party Dependencies
 
+// onyx
+// export { default as onyx } from 'https://raw.githubusercontent.com/oslabs-beta/onyx/main/mod.ts';
+// export { default as LocalStrategy } from 'https://raw.githubusercontent.com/oslabs-beta/onyx/main/src/strategies/local-strategy/local-strategy.ts';
+
+export { default as onyx } from '../mod.ts';
+export { default as LocalStrategy } from '../src/strategies/local-strategy/local-strategy.ts';
+
 // oak
 export {
   Application,
@@ -23,5 +30,3 @@ export { Session } from 'https://deno.land/x/session@1.1.0/mod.ts';
 // react
 export { default as React } from 'https://dev.jspm.io/react@16.14.0';
 export { default as ReactDOMServer } from 'https://dev.jspm.io/react-dom@16.14.0/server';
-
-// import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts"  // in case we want bcrypt
