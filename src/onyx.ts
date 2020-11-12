@@ -104,7 +104,7 @@ export default class Onyx {
       };
 
       // getUser returns the user info from User Database if user is Authenticated, if not it will return undefined
-      // this is different from Passport as we any info we store on context.state will persist (passport uses req[this.userProperty])
+      // this is different from Passport as any info we store on context.state will persist (passport uses req[this.userProperty])
       context.state.getUser = function () {
         if (!context.state.onyx.session) return;
         return context.state.onyx.session.user;
@@ -122,19 +122,15 @@ export default class Onyx {
         ) {
           if (err) throw new Error(err);
           else if (!user) {
-            // active session found but userDB query return undefine
             delete context.state.onyx.session;
 
-            // delete session
             const sidCookie = await context.cookies.get('sid');
-            // if using Redis for Session Store
             if (context.state.session._session._store._sessionRedisStore) {
               await context.state.session._session._store._sessionRedisStore.del(
                 sidCookie
               );
-            }
-            // else if using Session Memory for Session Store
-            else context.state.session._session._store.deleteSession(sidCookie);
+            } else
+              context.state.session._session._store.deleteSession(sidCookie);
           } else {
             if (!context.state.onyx.session) context.state.onyx.session = {};
             context.state.onyx.session.user = user;
@@ -143,10 +139,5 @@ export default class Onyx {
       }
       await next();
     };
-  }
-
-  // TODO
-  authorize(strategy: string, options?: any, callback?: Function) {
-    // for linking the 3rd party account to the account of a user that is currently athenticated
   }
 }

@@ -1,5 +1,5 @@
-import LocalStrategy from './local-strategy.ts';
-import { describe, it, expect } from '../../../test_deps.ts';
+import LocalStrategy from './../strategies/local-strategy/local-strategy.ts';
+import { describe, it, expect } from './../../test_deps.ts';
 
 describe('Local Strategy', () => {
   let strategy = new LocalStrategy(function () {});
