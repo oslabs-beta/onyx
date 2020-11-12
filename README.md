@@ -3,7 +3,7 @@
 
 Welcome to Onyx!
 
-Onyx is authentication middleware for Deno inspired by [Passport.js](http://www.passportjs.org/). Like Passport, Onyx prioritizes modularization and flexibility — it abstracts much of the authentication process away yet leaves exact control of the verification procedure up to the developer.
+Onyx is authentication middleware for Deno, inspired by [Passport.js](http://www.passportjs.org/). Like Passport, Onyx prioritizes modularization and flexibility — it abstracts much of the authentication process away yet leaves exact control of the verification procedure up to the developer.
 
 Onyx's primary concern is keeping code clean and organized. Through the use of specialized instructions called strategies, which are held in individual modules, you can streamline your authentication process without importing unnecessary dependencies.
 
@@ -42,6 +42,7 @@ onyx.use(
   )
 );
 ```
+To be clear, the developer must provide the user verification callback that the strategy will use, so that it will work for your particular application.
 
 ### onyx.authenticate
 
@@ -68,13 +69,15 @@ Use the following two functions if you are creating persistent sessions for your
 
 ### onyx.serializeUser
 
-Similar to `onyx.use()`, `onyx.serializeUser()` stores a callback you write that will be invoked later upon successful verification and authentication. This callback should serialize and store user information in some sort of session database.
+Similar to `onyx.use()`, `onyx.serializeUser()` stores a callback that will be invoked later upon successful verification and authentication. This callback should serialize and store user information in some sort of session database.
 
 ```typescript
 onyx.serializeUser(async function (user: any, cb: Function) {
   await cb(null, user._id.$oid);
 });
 ```
+
+Once again, the developer must provide the serializer callback that `serializeUser()` will store.
 
 ### onyx.deserializeUser
 
@@ -91,6 +94,8 @@ onyx.deserializeUser(async function (id: string, cb: Function) {
   }
 });
 ```
+
+And yes, the developer must provide the serializer callback that `deserializeUser()` will store.
 
 ## Digging Deeper
 
@@ -113,4 +118,4 @@ It creates an instance of the session manager, which controls and creates user s
 ## Developed by
 [Connie Cho](https://github.com/chcho2), [Alice Fu](https://github.com/alicejfu), [Chris Kopcow](https://github.com/opennoise1), [George Kruchinina](https://github.com/gkruchin) and [Cedric Lee](https://github.com/leeced94)
 
-Logo by Amanda Maduri
+Logo by [Amanda Maduri](https://www.linkedin.com/in/amanda-maduri/)
