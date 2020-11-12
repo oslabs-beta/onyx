@@ -9,23 +9,7 @@ describe('Local Strategy', () => {
     expect(strategy.name).toEqual('local');
   });
 
-  it('error should throw if constructed without a verify callback', function() {
-    //const result = await new LocalStrategy();
+  it('error should throw if constructed without a verify callback', function() { 
     expect(strategy['_verify']).toBeDefined();
-    // expect(function() {
-    //   var s = new LocalStrategy();
-    // }).toBeInstanceOf(TypeError, 'LocalStrategy requires a verify callback');
   });
-
 });
-  // describe('#initialize', () => {
-  //   describe('handling a request', () => {
-  //     const onyx = new Onyx();
-  //     onyx.initialize();
-
-  //     it('should set user property on authenticator ', async (done: any) => {
-  //       expect(onyx['_userProperty']).toEqual('user');
-  //       done();
-  //     });
-  //   });
-  // });~
