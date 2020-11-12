@@ -1,9 +1,6 @@
 import { Router } from '../deps.ts';
-import userController from './controllers/authController.ts';
-import sessionController from './controllers/sessionController.ts';
-// import users from './models/userModels.ts'
+import { onyx } from '../deps.ts';
 import User from './models/userModels.ts';
-import onyx from '../../mod.ts';
 
 const router = new Router();
 
@@ -15,7 +12,8 @@ router.post('/register', async (ctx) => {
 
   // option 1: construct a user object and invoke ctx.state.logIn
   const user = { username, _id };
-  await ctx.state.logIn(ctx, user, onyx, async (err: any) => {
+
+  await ctx.state.logIn(ctx, user, async (err: any) => {
     if (err) return ctx.throw(err);
     else {
       ctx.response.body = {
@@ -32,14 +30,8 @@ router.post('/login', async (ctx) => {
   await (await onyx.authenticate('local'))(ctx);
 
   if (await ctx.state.isAuthenticated()) {
-    const user = ctx.state.onyx.user;
-    console.log('user object in login route is', user);
-    const sessionUser = ctx.state.onyx.session.user;
-    console.log('sessionUser object in login is', sessionUser);
-
-    const userObj = await ctx.state.getUser();
-    console.log('userObj from getUser is', userObj);
-    // return ctx.state.onyx.session.user
+    const user = await ctx.state.getUser();
+    console.log('userObj from getUser is', user);
 
     ctx.response.body = {
       success: true,
@@ -65,10 +57,8 @@ router.get('/logout', async (ctx) => {
 
 router.get('/protected', async (ctx) => {
   if (await ctx.state.isAuthenticated()) {
-    console.log('session found, proceed to protected');
-    const { username } = ctx.state.onyx.session.user;
-    const user = ctx.state.onyx.user;
-    console.log('user found from onyx.user in protected route is', user);
+    const user = await ctx.state.getUser();
+    const { username } = user;
     ctx.response.body = {
       success: true,
       isAuth: true,

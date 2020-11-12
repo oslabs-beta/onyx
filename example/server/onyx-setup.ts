@@ -1,9 +1,22 @@
-import onyx from '../../mod.ts';
-import LocalStrategy from '../../src/strategies/local-strategy/local-strategy.ts';
+import { onyx, LocalStrategy } from '../deps.ts';
 import User from './models/userModels.ts';
-import userController from './controllers/authController.ts';
 
-console.log('in onyx-setup');
+// Configure the Strategy, constructor takes up to 2 arguments
+// 1: optional: options
+// 2: required: provide verify function that will receive username, password, and a callback function.  Verify the username/password is correct before invoking the callback function.
+onyx.use(
+  new LocalStrategy(
+    async (username: string, password: string, done: Function) => {
+      try {
+        const user = await User.findOne({ username });
+        if (user && password === user.password) await done(null, user);
+        else await done(null);
+      } catch (error) {
+        await done(error);
+      }
+    }
+  )
+);
 
 // user needs to provide the serializer function that will specify what to store in the session db - typically just the user id
 onyx.serializeUser(async function (user: any, cb: Function) {
@@ -20,18 +33,3 @@ onyx.deserializeUser(async function (id: string, cb: Function) {
     await cb(error, null);
   }
 });
-
-// onyx.use(new LocalStrategy(userController.verifyUser));
-
-onyx.use(
-  new LocalStrategy(async (context: any, done: Function) => {
-    const { username, password } = context.state.onyx.user;
-    try {
-      const user = await User.findOne({ username });
-      if (user && password === user.password) await done(null, user);
-      else await done(null);
-    } catch (error) {
-      await done(error);
-    }
-  })
-);
