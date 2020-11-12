@@ -61,8 +61,7 @@ export default class LocalStrategy extends Strategy {
     const self = this;
 
     try {
-      // await this._verify(context, verified);
-      await this._verify(username, password, verified);
+      await this._verify(context, verified);
     } catch (err) {
       return self.funcs.error(err);
     }
