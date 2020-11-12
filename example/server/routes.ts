@@ -4,7 +4,6 @@ import User from './models/userModels.ts';
 
 const router = new Router();
 
-// 11.10 *todo* separate session-strategy? consolidate all the options?
 router.post('/register', async (ctx) => {
   const body = await ctx.request.body();
   const { username, password } = await body.value;
@@ -18,7 +17,8 @@ router.post('/register', async (ctx) => {
     else {
       ctx.response.body = {
         success: true,
-        message: user,
+        username,
+        isAuth: true,
       };
     }
   });
@@ -26,25 +26,28 @@ router.post('/register', async (ctx) => {
   // option 2: invoke onyx.authenticate - see login route for reference
 });
 
+// invoke onyx.authenticate with the name of the strategy, invoke the result with context
 router.post('/login', async (ctx) => {
   await (await onyx.authenticate('local'))(ctx);
 
   if (await ctx.state.isAuthenticated()) {
-    const user = await ctx.state.getUser();
-
+    const { username } = await ctx.state.getUser();
     ctx.response.body = {
       success: true,
-      message: user,
+      username,
+      isAuth: true,
     };
   } else {
     const message = ctx.state.onyx.errorMessage || 'login unsuccessful';
     ctx.response.body = {
       success: false,
       message,
+      isAuth: false,
     };
   }
 });
 
+// invoke ctx.state.logOut in the logout path
 router.get('/logout', async (ctx) => {
   await ctx.state.logOut(ctx);
   ctx.response.body = {
@@ -53,6 +56,7 @@ router.get('/logout', async (ctx) => {
   };
 });
 
+// isAuthenticated will return true if user if Authenticated
 router.get('/protected', async (ctx) => {
   if (await ctx.state.isAuthenticated()) {
     const user = await ctx.state.getUser();
