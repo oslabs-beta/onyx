@@ -23,7 +23,7 @@ Before doing anything else, it's important to import the authentication strategi
 For example, importing in the local strategy looks like this.
 
 ```typescript
-import LocalStrategy from 'deno.land/x/onyx/src/strategies/local-strategy/local-strategy.ts'
+import LocalStrategy from 'https://deno.land/x/onyx/src/strategies/local-strategy/local-strategy.ts'
 ```
 
 Next, let's go over Onyx's most vital methods: `onyx.use()`, `onyx.authenticate()` and `onyx.initialize()`.
