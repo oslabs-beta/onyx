@@ -5,8 +5,8 @@ export * as log from 'https://deno.land/std@0.74.0/log/mod.ts';
 // Third Party Dependencies
 
 // onyx
-export { default as onyx } from 'https://raw.githubusercontent.com/oslabs-beta/onyx/main/mod.ts';
-export { default as LocalStrategy } from 'https://raw.githubusercontent.com/oslabs-beta/onyx/main/src/strategies/local-strategy/local-strategy.ts';
+export { default as onyx } from 'https://deno.land/x/onyx@v1.0/mod.ts';
+export { default as LocalStrategy } from 'https://deno.land/x/onyx@v1.0/src/strategies/local-strategy/local-strategy.ts';
 
 // oak
 export {
