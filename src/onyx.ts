@@ -41,7 +41,6 @@ export default class Onyx {
   }
 
   /* Options:   *note* *README*
-   *   - `session`          Save login state in session, defaults to _true_
    *   - `successRedirect`  After successful login, redirect to given URL
    *   - `successMessage`   True to store success message in
    *                        req.session.messages, or a string to use as override
@@ -50,8 +49,6 @@ export default class Onyx {
    *   - `failureMessage`   True to store failure message in
    *                        req.session.messages, or a string to use as override
    *                        message for failure.
-   *   - `assignProperty`   Assign the object provided by the verify callback to given property
-   *
    */
 
   authenticate(
@@ -61,7 +58,6 @@ export default class Onyx {
       failureRedirect?: string;
       successMessage?: string;
       failureMessage?: string;
-      assignProperty?: string;
     },
     callback?: Function
   ) {
