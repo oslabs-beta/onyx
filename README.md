@@ -1,6 +1,9 @@
-# Onyx
+![Onyx Logo](https://i.imgur.com/SglpX1j.png)
 
-Onyx is authentication middleware for Deno inspired by Passport.js. Like Passport, Onyx prioritizes modularization and flexibility — it abstracts much of the authentication process away yet leaves exact control of the verification procedure up to the developer.
+
+Welcome to Onyx!
+
+Onyx is authentication middleware for Deno inspired by [Passport.js](http://www.passportjs.org/). Like Passport, Onyx prioritizes modularization and flexibility — it abstracts much of the authentication process away yet leaves exact control of the verification procedure up to the developer.
 
 Onyx's primary concern is keeping code clean and organized. Through the use of specialized instructions called strategies, which are held in individual modules, you can streamline your authentication process without importing unnecessary dependencies.
 
@@ -10,7 +13,7 @@ All you need is one line to get started.
 import Onyx from
 ```
 
-When you import the Onyx module, what you're really importing is an object called 'Onyx' that has a number of built-in methods. A couple of those methods you will need to use as Oak middleware to use Onyx. Others are primarily used by Onyx under the hood to assist with the authentication process. However, if you are a developer interested in creating new or custom strategies for Onyx, it will likely be important to understand how these work.
+When you import the Onyx module, what you're really importing is an object called 'Onyx' that has a number of built-in methods. A couple of those methods you will need to use as [Oak](https://deno.land/x/oak@v6.3.1) middleware to use Onyx. Others are primarily used by Onyx under the hood to assist with the authentication process. However, if you are a developer interested in creating new or custom strategies for Onyx, it will likely be important to understand how these work.
 
 ## Where to Start
 
@@ -20,11 +23,28 @@ First, though, let's go over Onyx's most vital methods: `onyx.use()`, `onyx.auth
 
 `onyx.use()` configures and stores a strategy to to be implemented later on by Onyx. This step must be completed first in order to continue authentication process. After all, without a strategy, Onyx doesn't have anything to use to complete the authentication process.
 
+```typescript
+onyx.use(new LocalStrategy(async (context: any, done: Function) => {
+  const { username, password } = context.state.onyx.user;
+  
+  try {
+    const user = await User.findOne({ username });
+    if (user && password === user.password) {
+      await done(null, user);
+     } else {
+       await done(null);
+     }
+  } catch (error) {
+    await done(error);
+  }
+}));
+```
+
 ### onyx.authenticate
 
 `onyx.authenticate()` is the heart of Onyx — it's what you will use to initiate an authenticate process.
 
-When you want to authenticate a user, simply invoke `onyx.authenticate()` and pass in a reference to the strategy you stored with onyx.use() above.
+When you want to authenticate a user, simply invoke `onyx.authenticate()` and pass in a reference to the strategy you stored with `onyx.use()` above.
 
 ### onyx.initialize
 
@@ -48,7 +68,7 @@ While the following methods are not required to authenticate with Onyx, you may 
 
 ### onyx.unuse
 
-`onyx.unuse()` does exactly what it sounds like it does: It deletes the strategy you stored when using onyx.use().
+`onyx.unuse()` does exactly what it sounds like it does: It deletes the strategy you stored when using `onyx.use()`.
 
 ### onyx.init
 
