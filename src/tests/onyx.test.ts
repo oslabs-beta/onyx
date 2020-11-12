@@ -1,6 +1,6 @@
-import Onyx from './onyx.ts';
-import Strategy from './strategy.ts';
-import { describe, it, expect, assertThrowsAsync } from '../test_deps.ts';
+import Onyx from './../onyx.ts';
+import Strategy from './../strategy.ts';
+import { describe, it, expect, assertThrowsAsync } from './../../test_deps.ts';
 
 describe('Onyx', () => {
   describe('#use', () => {
@@ -59,7 +59,6 @@ describe('Onyx', () => {
         const stratInstance2: any = new testStrategy();
         onyx.use('new name', stratInstance);
         expect(typeof onyx['_strategies']['new name']).toEqual('object');
-        // assertObjectMatch(onyx['_strategies']['default'], stratInstance2);
         done();
       });
     });
@@ -164,25 +163,25 @@ describe('Onyx', () => {
     const ctx = new Context();
     const onyx = new Onyx();
 
-    // it('Onyx #initialize should throw error if session not set up', async (done) => {
-    //   assertThrowsAsync(
-    //     (): Promise<any> => {
-    //       return new Promise((): void => {
-    //         onyx.initialize()(ctx, () => {});
-    //       });
-    //     },
-    //     Error,
-    //     'Must set up Session before Onyx!'
-    //   );
-    //   done();
-    // });
-
     it('Onyx #initialize should create a new instance of Onyx', async (done) => {
       ctx.state.session = {
         get: (str: string) => undefined,
       };
       onyx.initialize()(ctx, () => {});
       expect(ctx.state.onyx).toBeInstanceOf(Onyx);
+      done();
+    });
+
+    it('Onyx #initialize should add logIn, logOut, isAuthenticated, isUnauthenticated, getUser functions to context.state', async (done) => {
+      ctx.state.session = {
+        get: (str: string) => undefined,
+      };
+      onyx.initialize()(ctx, () => {});
+      expect(typeof ctx.state.logIn).toEqual('function');
+      expect(typeof ctx.state.logOut).toEqual('function');
+      expect(typeof ctx.state.isAuthenticated).toEqual('function');
+      expect(typeof ctx.state.isUnauthenticated).toEqual('function');
+      expect(typeof ctx.state.getUser).toEqual('function');
       done();
     });
   });
@@ -201,6 +200,17 @@ describe('Onyx', () => {
     it('should unregister strategy', async (done: any) => {
       expect(onyx['_strategies']['one']).toBeUndefined();
       expect(typeof onyx['_strategies']['two']).toEqual('object');
+      done();
+    });
+  });
+
+  describe('#authenticate', () => {
+    class testStrategy extends Strategy {}
+    const onyx = new Onyx();
+    onyx.use('one', new testStrategy());
+
+    it('Onyx #authenticate should return a function', async (done: any) => {
+      expect(typeof onyx.authenticate('one')).toEqual('function');
       done();
     });
   });

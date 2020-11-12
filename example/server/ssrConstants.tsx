@@ -13,7 +13,6 @@ const html: string = `<html><head><script type="module" src="${browserBundlePath
   <App />
 )}</div></body></html>`;
 
-// needed to send the browser the Inputs as well otherwise html part will show everything but as soon as js part is received browser will complain "Uncaught ReferenceError: Component is not defined"
 const js: string = `import React from "https://dev.jspm.io/react@16.14.0";
   \nimport ReactDOM from "https://dev.jspm.io/react-dom@16.14.0";
   \nconst Message = ${Message};

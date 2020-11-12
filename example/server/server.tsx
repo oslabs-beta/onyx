@@ -14,10 +14,10 @@ import { html, browserBundlePath, js } from './ssrConstants.tsx';
 const port: number = Number(Deno.env.get('PORT')) || 4000;
 const app: Application = new Application();
 
-// session for Server Memory
+// session with Server Memory
 // const session = new Session({ framework: 'oak' });
 
-// session from Redis Memory
+// session with Redis Database
 const session = new Session({
   framework: 'oak',
   store: 'redis',
