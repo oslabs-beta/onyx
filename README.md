@@ -95,7 +95,7 @@ onyx.deserializeUser(async function (id: string, cb: Function) {
 });
 ```
 
-And yes, the developer must provide the serializer callback that `deserializeUser()` will store.
+And yes, the developer must provide the deserializer callback that `deserializeUser()` will store.
 
 ## Digging Deeper
 
