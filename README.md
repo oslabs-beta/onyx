@@ -13,11 +13,13 @@ All you need is one line to get started.
 import onyx from 'https://deno.land/x/onyx@v1.0/mod.ts'
 ```
 
-When you import the Onyx module, what you're really importing is an instance of 'onyx' that has a number of built-in methods. You will need to use onyx as middleware in [Oak](https://deno.land/x/oak@v6.3.1). Additionally, setting up the [session module](https://github.com/denjucks/session) on the server will also be required. Some methods are primarily used by Onyx under the hood to assist with the authentication process. However, if you are a developer interested in creating new or custom strategies for Onyx, it will likely be important to understand how these work.
+When you import the Onyx module, what you're really importing is an instance of 'Onyx' that has a number of built-in methods. While some of these methods you will invoke yourself, others are primarily used by Onyx under the hood to assist with the authentication process. However, if you are a developer interested in creating new or custom strategies for Onyx, it will likely be important to understand how these work.
+
+By the way, you will need to use the [Oak](https://deno.land/x/oak@v6.3.1) framework for Deno to use Onyx. Additionally, you will need to set up the [session module](https://deno.land/x/session@1.1.0) on the server to use persistent sessions with Onyx. 
 
 ## Where to Start
 
-Before doing anything else, it's important to import the authentication strategies you want to use in your application. These strategies are available on our [website](http://onyxts.land) and on our [Deno.land page](https://deno.land/x/onyx@v1.0/src/strategies).
+Before doing anything else, it's important to import the authentication strategies you want to use in your application. These strategies are available on our [website](http://onyxts.land) and on our [Deno.land page](https://deno.land/x/onyx/src/strategies).
 
 For example, importing in the local strategy looks like this.
 
