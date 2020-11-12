@@ -3,7 +3,6 @@ import { React } from '../../deps.ts';
 const Protected: any = (props: any) => {
   const { setPage } = props;
   const logout = () => {
-    console.log('logout');
     fetch('/logout', {
       method: 'GET',
       headers: {
@@ -14,8 +13,6 @@ const Protected: any = (props: any) => {
       .then((data) => {
         if (data.success) {
           setPage('entry');
-        } else {
-          // something on backend not set up successfully
         }
       })
       .catch((err) => console.log(JSON.stringify(err)));

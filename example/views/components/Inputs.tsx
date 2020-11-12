@@ -16,9 +16,7 @@ const Inputs: any = (props: any) => {
   };
 
   const submit = (path: string) => {
-    // client-side validation
     if (username.trim() === '' || password.trim() === '') {
-      // can't do alert, don't know why
       return;
     }
 
@@ -31,10 +29,9 @@ const Inputs: any = (props: any) => {
     })
       .then((data) => data.json())
       .then((data) => {
-        setMessage(data.success); // true or false
+        setMessage(data.success);
         setUsername('');
         setPassword('');
-        // if data.success is true, set page to 'protected'
         if (data.isAuth) setPage('protected');
       })
       .catch((e) => {
