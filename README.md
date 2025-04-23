@@ -125,6 +125,6 @@ onyx.unuse('local')
 It creates an instance of the session manager, which controls and creates user sessions.
 
 ## Developed by
-[Connie Cho](https://github.com/chcho2), [Alice Fu](https://github.com/alicejfu), [Chris Kopcow](https://github.com/opennoise1), [George Kruchinina](https://github.com/gkruchin) and [Cedric Lee](https://github.com/leeced94)
+[Connie Cho](https://github.com/chcho2), [Alice Fu](https://github.com/alicejfu), [Chris Kopcow](https://github.com/opennoise1), [GK](https://github.com) and [Cedric Lee](https://github.com/leeced94)
 
 Logo by [Amanda Maduri](https://www.linkedin.com/in/amanda-maduri/)
